@@ -21,3 +21,7 @@ body {
     font-family: 'Quicksand', sans-serif;
     color: var(--text-dark);
 }
+
+a{
+    cursor: pointer;
+}

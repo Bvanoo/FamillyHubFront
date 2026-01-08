@@ -3,12 +3,24 @@ import { Home } from './home/home';
 import { Calendar } from './calendar/calendar';
 import { loginGuard } from './guard/login-guard';
 import { Login } from './login/login';
+import { Signup } from './signup/signup';
+import { Nouveaumdp } from './nouveaumdp/nouveaumdp';
+import { Messenger } from './messenger/messenger';
+import { Groupes } from './groupes/groupes';
+import { Randomizer } from './randomizer/randomizer';
+import { Profil } from './profil/profil';
 
 export const routes: Routes = [
     
     {path: "home", component: Home, canActivate: [loginGuard]},
     {path: "calendar", component: Calendar, canActivate: [loginGuard]},
     {path: "login", component: Login},
+    {path: "signup", component: Signup},
+    {path: "randomizer", component: Randomizer},
+    {path: "profil", component: Profil},
+    {path: "groupes", component: Groupes},
+    {path: "messenger", component: Messenger},
+    {path: "nouveaumdp", component: Nouveaumdp},
     {path: "**", redirectTo : 'home'},
 
 

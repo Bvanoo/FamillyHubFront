@@ -2,12 +2,12 @@ import { Component, inject } from '@angular/core';
 import { Navigation } from '../Services/navigation';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-nouveaumdp',
   imports: [],
-  templateUrl: './login.html',
-  styleUrl: './login.css',
+  templateUrl: './nouveaumdp.html',
+  styleUrl: './nouveaumdp.css',
 })
-export class Login {
+export class Nouveaumdp {
 
   _nav = inject(Navigation)
 }

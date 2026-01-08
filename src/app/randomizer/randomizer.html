@@ -1,0 +1,71 @@
+<div class="app">
+  <main class="content">
+
+    <header class="header">
+      <h1>🎲 Randomizer</h1>
+      <button class="btn-primary">Historique</button>
+    </header>
+
+    <section class="randomizer-layout">
+
+      <div class="card config-window">
+        <h2>Configuration</h2>
+        
+        <div class="mode-selector">
+          <button class="mode-btn active">
+            <span class="icon">🥜</span>
+            <strong>Cacahuète</strong>
+            <small>Tirage croisé</small>
+          </button>
+          <button class="mode-btn">
+            <span class="icon">📋</span>
+            <strong>Tâche</strong>
+            <small>Assigner un élu</small>
+          </button>
+        </div>
+
+        <div class="setup-area">
+          <div class="input-group">
+            <label>Titre de l'événement</label>
+            <input type="text" placeholder="Ex: Noël en famille...">
+          </div>
+          
+          <div class="result-placeholder">
+            <p>Sélectionnez un groupe et lancez le tirage</p>
+          </div>
+        </div>
+
+        <button class="btn-primary btn-launch">Lancer le tirage</button>
+      </div>
+
+      <div class="card groups-panel">
+        <div class="panel-header">
+          <h2>📁 Sélection du groupe</h2>
+        </div>
+
+        <div class="groups-selection-area">
+          <div class="input-group">
+            <label for="group-picker">Groupe actif</label>
+            <select id="group-picker" class="group-select">
+              <option value="" disabled selected>-- Choisir un groupe --</option>
+              <option value="famille">🏠 Famille</option>
+              <option value="bureau">💼 Bureau</option>
+              <option value="sport">🏀 Club Sport</option>
+            </select>
+          </div>
+
+          <div class="participants-list-container">
+            <h3>Membres du groupe</h3>
+            <ul id="participants-list" class="members-display">
+              <li class="placeholder-text">Aucun groupe sélectionné</li>
+            </ul>
+          </div>
+        </div>
+
+        <button class="btn-secondary">Gérer les membres</button>
+      </div>
+
+    </section>
+  </main>
+  <span> </span>
+</div>

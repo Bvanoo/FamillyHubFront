@@ -12,18 +12,18 @@ import { filter } from 'rxjs';
 })
 export class Banner {
 
-  _Nav = inject(Navigation)
-  _Router = inject(Router)
+  _nav = inject(Navigation)
+  _router = inject(Router)
 
   currentUrl = signal('');
 
   ngOnInit(): void {
-    this._Router.events
+    this._router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         this.currentUrl.set(event.urlAfterRedirects);
       });
-    this.currentUrl.set(this._Router.url);
+    this.currentUrl.set(this._router.url);
   }
   hasRoute(path: string): boolean {
     return this.currentUrl().includes(path);

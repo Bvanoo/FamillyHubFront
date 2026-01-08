@@ -6,25 +6,25 @@
 
     <ul class="nav-links">
         <li [ngClass]="{ 'active': hasRoute('/home') }">
-            <a (click)="_Nav.goToHome()"> <i class="fas fa-home"></i> <span>Accueil</span></a>
+            <a (click)="_nav.goToHome()"> <i class="fas fa-home"></i> <span>Accueil</span></a>
         </li>
         <li [ngClass]="{ 'active': hasRoute('/calendar') }">
-            <a (click)="_Nav.goToCalendar()"><i class="fas fa-calendar-alt"></i> <span>Calendrier</span></a>
+            <a (click)="_nav.goToCalendar()"><i class="fas fa-calendar-alt"></i> <span>Calendrier</span></a>
         </li>
         <li [ngClass]="{ 'active': hasRoute('/messages') }">
-            <a href="#"><i class="fas fa-comments"></i> <span>Messages</span></a>
+            <a (click)="_nav.goToMessenger()"><i class="fas fa-comments"></i> <span>Messages</span></a>
         </li>
         <li [ngClass]="{ 'active': hasRoute('/tricount') }">
-            <a href="#"><i class="fas fa-wallet"></i> <span>Dépenses</span></a>
+            <a (click)="_nav.goToGroupes()"><i class="fas fa-users"></i> <span>Groupes</span></a>
         </li>
         <li [ngClass]="{ 'active': hasRoute('/random') }">
-            <a href="#"><i class="fas fa-dice"></i> <span>Randomizer</span></a>
+            <a (click)="_nav.goToRandomizer()"><i class="fas fa-dice"></i> <span>Randomizer</span></a>
         </li>
     </ul>
 
     <div class="sidebar-footer">
-        <div class="user-profile">
-            <img src="avatar-user.jpg" alt="Profil">
+        <div class="user-profile" (click)="_nav.goToProfil()">
+            <img src="https://picsum.photos/200/300" alt="Profil">
             <div class="user-info">
                 <p class="name">Jean Dupont</p>
                 <p class="status">En ligne</p>

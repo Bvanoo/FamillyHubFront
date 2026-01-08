@@ -1,0 +1,120 @@
+.messenger-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 25px;
+}
+
+.content {
+    padding: 40px;
+    margin-left: 260px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 100vh;
+}
+
+.card {
+    background: var(--white);
+    border-radius: var(--border-radius-lg);
+    padding: 30px;
+    box-shadow: var(--card-shadow);
+    border: 2px solid transparent;
+}
+
+.chat-window {
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.message {
+    max-width: 70%;
+    padding: 14px 18px;
+    border-radius: 20px;
+    margin-bottom: 15px;
+}
+
+.message span {
+    display: block;
+    font-size: 0.7rem;
+    margin-top: 5px;
+    opacity: 0.6;
+}
+
+.message.received {
+    background: #f1f5f9;
+    align-self: flex-start;
+}
+
+.message.sent {
+    background: var(--active-gradient);
+    color: white;
+    align-self: flex-end;
+}
+
+.chat-input {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 14px 18px;
+    border-radius: var(--border-radius-md);
+    border: 2px solid #f0f0f0;
+}
+
+.btn-primary {
+    background: var(--active-gradient);
+    color: var(--white);
+    border: none;
+    padding: 14px 28px;
+    border-radius: var(--border-radius-md);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.contacts-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.contact {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.contact.active {
+    background: #f1f9ff;
+}
+
+.avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: var(--active-gradient);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+}

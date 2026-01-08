@@ -30,14 +30,14 @@
         <label class="remember-me">
           <input type="checkbox"> Souvenir de moi
         </label>
-        <a href="#" class="forgot-link">Oublié ?</a>
+        <a (click)="_nav.goToNouveaumdp()" class="forgot-link">Oublié ?</a>
       </div>
 
-      <button type="submit" class="btn-login">C'est parti !</button>
+      <button type="button" (click)="_nav.goToHome()" class="btn-login">C'est parti !</button>
     </form>
 
     <div class="login-footer">
-      <p>Pas encore de compte ? <a href="#">Rejoindre la famille</a></p>
+      <p>Pas encore de compte ? <a (click)="_nav.goToSignup()">Rejoindre la famille</a></p>
     </div>
   </div>
 </div>

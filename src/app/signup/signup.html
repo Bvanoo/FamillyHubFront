@@ -1,0 +1,63 @@
+<div class="login-container">
+    <div class="login-card">
+
+        <div class="login-header">
+            <div class="logo-circle">
+                <img src="FamHubIcon.png" alt="">
+            </div>
+            <h1>Family<span>Hub</span></h1>
+            <p>Créer votre espace famille</p>
+        </div>
+
+        <form class="login-form">
+
+            <div class="form-group">
+                <label for="name">Nom complet</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="name" placeholder="Papa Dupont">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="famille@exemple.com">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="••••••••">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm-password">Confirmer le mot de passe</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="confirm-password" placeholder="••••••••">
+                </div>
+            </div>
+
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox">
+                    J'accepte les conditions
+                </label>
+            </div>
+
+            <button type="button" (click)="_nav.goToHome()" class="btn-login">
+                Rejoindre la famille
+            </button>
+        </form>
+
+        <div class="login-footer">
+            <p>Déjà un compte ? <a (click)="_nav.goBack()">Se connecter</a></p>
+        </div>
+
+    </div>
+</div>

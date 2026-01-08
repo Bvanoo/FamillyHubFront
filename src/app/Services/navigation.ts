@@ -16,6 +16,24 @@ export class Navigation {
   goToHome() {
     this._router.navigate(['/home']);
   }
+  goToSignup() {
+    this._router.navigate(['/signup']);
+  }
+  goToNouveaumdp() {
+    this._router.navigate(['/nouveaumdp']);
+  }
+  goToMessenger() {
+    this._router.navigate(['/messenger']);
+  }
+  goToRandomizer() {
+    this._router.navigate(['/randomizer']);
+  }
+  goToProfil() {
+    this._router.navigate(['/profil']);
+  }
+  goToGroupes() {
+    this._router.navigate(['/groupes']);
+  }
   goToCalendar() {
     this._router.navigate(['/calendar']);
   }

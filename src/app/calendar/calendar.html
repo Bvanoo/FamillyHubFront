@@ -1,1 +1,71 @@
-<p>calendar works!</p>
+<div class="app">
+  <main class="content">
+    
+    <header class="header">
+      <h1>📅 Planning & Dispos</h1>
+      <div class="header-actions">
+        <button class="btn-secondary" style="margin-top:0; width:auto;">Exporter</button>
+        <button class="btn-primary">Enregistrer</button>
+      </div>
+    </header>
+
+    <section class="calendar-layout">
+      
+      <aside class="card sidebar-config">
+        <div class="config-section">
+          <h3>Types de Disponibilité</h3>
+          <div class="options-grid">
+            <label class="option-card">
+              <input type="radio" name="dispo-type" checked>
+              <div class="option-content">
+                <span class="dot green"></span>
+                <strong>Disponible</strong>
+                <small>Temps plein</small>
+              </div>
+            </label>
+            
+            <label class="option-card">
+              <input type="radio" name="dispo-type">
+              <div class="option-content">
+                <span class="dot orange"></span>
+                <strong>Partiel</strong>
+                <small>Matin / Après-midi</small>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="config-section">
+          <h3>Indisponibilités</h3>
+          <div class="input-group">
+            <label>Motif personnalisé</label>
+            <input type="text" placeholder="Ex: Congés, RDV...">
+          </div>
+          <div class="input-group">
+            <label>Couleur du bloc</label>
+            <input type="color" value="#ff7675" class="color-picker">
+          </div>
+        </div>
+
+        <div class="config-section status-legend">
+          <h3>Légende</h3>
+          <ul>
+            <li><span class="badge blue"></span> Travail</li>
+            <li><span class="badge yellow"></span> Perso</li>
+            <li><span class="badge red"></span> Urgent</li>
+          </ul>
+        </div>
+      </aside>
+
+      <div class="card calendar-container">
+        <div id="calendar-root">
+           <div class="placeholder-calendar">
+             <span style="font-size: 3rem;">🗓️</span>
+             <p>Insère ton calendrier interactif ici</p>
+           </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+</div>

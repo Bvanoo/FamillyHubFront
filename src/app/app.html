@@ -1,2 +1,2 @@
-<app-banner [ngClass]="{ 'disable': hasRoute('/login') }"></app-banner>
+<app-banner [ngClass]="{ 'disable': hasRoute('/login') || hasRoute('/signup') || hasRoute('/nouveaumdp') }"></app-banner>
 <router-outlet></router-outlet>
