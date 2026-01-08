@@ -1,5 +1,34 @@
-<div class="header">
-    <img src="FamHubIcon.png" alt="">
-    <h1>FamilyHub</h1>
-    <span> </span>
-</div>
+<nav class="sidebar">
+    <div class="sidebar-header">
+        <img src="FamHubIcon.png" alt="FamillyHub Logo" class="logo">
+        <span class="brand-name">FamillyHub</span>
+    </div>
+
+    <ul class="nav-links">
+        <li [ngClass]="{ 'active': hasRoute('/home') }">
+            <a (click)="_Nav.goToHome()"> <i class="fas fa-home"></i> <span>Accueil</span></a>
+        </li>
+        <li [ngClass]="{ 'active': hasRoute('/calendar') }">
+            <a (click)="_Nav.goToCalendar()"><i class="fas fa-calendar-alt"></i> <span>Calendrier</span></a>
+        </li>
+        <li [ngClass]="{ 'active': hasRoute('/messages') }">
+            <a href="#"><i class="fas fa-comments"></i> <span>Messages</span></a>
+        </li>
+        <li [ngClass]="{ 'active': hasRoute('/tricount') }">
+            <a href="#"><i class="fas fa-wallet"></i> <span>Dépenses</span></a>
+        </li>
+        <li [ngClass]="{ 'active': hasRoute('/random') }">
+            <a href="#"><i class="fas fa-dice"></i> <span>Randomizer</span></a>
+        </li>
+    </ul>
+
+    <div class="sidebar-footer">
+        <div class="user-profile">
+            <img src="avatar-user.jpg" alt="Profil">
+            <div class="user-info">
+                <p class="name">Jean Dupont</p>
+                <p class="status">En ligne</p>
+            </div>
+        </div>
+    </div>
+</nav>

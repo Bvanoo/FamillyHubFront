@@ -3,3 +3,21 @@
     padding: 0;
     box-sizing: border-box;
 }
+
+:root {
+    --primary-color: #117ebd;
+    --bg-light: #fcfcfc;
+    --secondary-color: #f5cc33;
+    --text-dark: #2D3436;
+    --white: #FFFFFF;
+    --active-gradient: linear-gradient(135deg, #64b5f6 0%, #2196f3 100%);
+    --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    --border-radius-lg: 30px;
+    --border-radius-md: 20px;
+}
+
+body {
+    background-color: var(--white);
+    font-family: 'Quicksand', sans-serif;
+    color: var(--text-dark);
+}

@@ -7,3 +7,6 @@ Couleurs:
 #ed8725
 Police: 
 Titre
+QuickSand
+Texte
+Monstserrat
