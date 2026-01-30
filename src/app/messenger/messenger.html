@@ -6,36 +6,33 @@
         <section class="messenger-layout">
             <div class="card chat-window">
                 <div class="chat-header">
-                    <h2>Emma </h2>
+                    <h2>Conversation #{{currentConversationId}}</h2>
                     <span class="status online">En ligne</span>
                 </div>
 
                 <div class="chat-messages">
-                    <div class="message received">
-                        <p>Tu viens me chercher à la danse ?</p>
-                        <span>17:42</span>
+                    <div *ngFor="let msg of messages()" 
+                         [ngClass]="{'message sent': msg.isMe, 'message received': !msg.isMe}">
+                        <p>{{ msg.content }}</p>
+                        <span>{{ msg.createdAt | date:'HH:mm' }}</span>
                     </div>
-
-                    <div class="message sent">
-                        <p>Oui, j'arrive dans 10 minutes 🙂</p>
-                        <span>17:43</span>
-                    </div>
-
-                    <div class="message received">
-                        <p>Super merci ❤️</p>
-                        <span>17:44</span>
+                    
+                    <div *ngIf="messages.length === 0" style="text-align: center; opacity: 0;">
+                        Commencez la discussion...
                     </div>
                 </div>
 
                 <div class="chat-input">
-                    <input type="text" placeholder="Écrire un message...">
-                    <button class="btn-primary">Envoyer</button>
+                    <input type="text" 
+                           [(ngModel)]="newMessageContent" 
+                           (keyup.enter)="envoyerMessage()"
+                           placeholder="Écrire un message...">
+                    <button class="btn-primary" (click)="envoyerMessage()">Envoyer</button>
                 </div>
             </div>
 
             <div class="card contacts-panel">
                 <h2>👨‍👩‍👧‍👦 Contacts</h2>
-
                 <div class="contact active">
                     <span class="avatar">E</span>
                     <div class="contact-info">
@@ -43,24 +40,7 @@
                         <small>En ligne</small>
                     </div>
                 </div>
-
-                <div class="contact">
-                    <span class="avatar">L</span>
-                    <div class="contact-info">
-                        <strong>Lucas</strong>
-                        <small>Dernier message à 16h</small>
-                    </div>
                 </div>
-
-                <div class="contact">
-                    <span class="avatar">P</span>
-                    <div class="contact-info">
-                        <strong>Paul</strong>
-                        <small>Hors ligne</small>
-                    </div>
-                </div>
-            </div>
         </section>
-        <span> </span>
     </main>
 </div>
