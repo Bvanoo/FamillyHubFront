@@ -19,8 +19,8 @@ export class Messenger implements OnInit {
   newMessageContent: string = '';
 
   constructor(
-    private signalrService: SignalrService,
-    private http: HttpClient
+    private readonly signalrService: SignalrService,
+    private readonly http: HttpClient
   ) {}
 
   ngOnInit() {

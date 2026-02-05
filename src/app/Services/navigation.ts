@@ -8,7 +8,7 @@ export class Navigation {
 
   _router = inject(Router);
   _location = inject(Location);
-  userName= signal("azaz");
+  userName= signal("");
 
   goBack(): void {
     this._location.back();
@@ -18,6 +18,9 @@ export class Navigation {
   }
   goToSignup() {
     this._router.navigate(['/signup']);
+  }
+  goToLogin() {
+    this._router.navigate(['/login']);
   }
   goToNouveaumdp() {
     this._router.navigate(['/nouveaumdp']);

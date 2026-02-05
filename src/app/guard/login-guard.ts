@@ -7,6 +7,6 @@ export const loginGuard: CanActivateFn = (route, state) => {
   if (_nav.userName()){
     return true;
   }
-  _nav.goToHome();
+  _nav.goToLogin();
   return false;
 };

@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class SignalrService {
   public hubConnection!: signalR.HubConnection;
-  private messageReceivedSubject = new BehaviorSubject<{senderId: number, content: string, createdAt: Date} | null>(null);
+  private readonly messageReceivedSubject = new BehaviorSubject<{senderId: number, content: string, createdAt: Date} | null>(null);
   public messageReceived$ = this.messageReceivedSubject.asObservable();
 
   constructor() {}

@@ -13,8 +13,8 @@ import { Profil } from './profil/profil';
 export const routes: Routes = [
     
     {path: "home", component: Home, canActivate: [loginGuard]},
-    {path: "calendar", component: Calendar, canActivate: [loginGuard]},
     {path: "login", component: Login},
+    {path: "calendar", component: Calendar, canActivate: [loginGuard]},
     {path: "signup", component: Signup},
     {path: "randomizer", component: Randomizer},
     {path: "profil", component: Profil},
