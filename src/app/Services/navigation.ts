@@ -9,6 +9,7 @@ export class Navigation {
   _router = inject(Router);
   _location = inject(Location);
   userName= signal("");
+  user= signal("");
 
   goBack(): void {
     this._location.back();
