@@ -1,5 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { AfterViewInit, Component, inject } from '@angular/core';
 import { Navigation } from '../Services/navigation';
+declare let google: any;
 
 @Component({
   selector: 'app-login',
@@ -7,16 +8,32 @@ import { Navigation } from '../Services/navigation';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login {
+export class Login implements AfterViewInit {
+  _nav = inject(Navigation);
+  ngAfterViewInit() {
+    google.accounts.id.initialize({
+      client_id:
+        '123887637516-givp4aionno6svukrfksbvva00640rj5.apps.googleusercontent.com',
+      callback: this.handleCredentialResponse.bind(this),
+    });
 
-  _nav = inject(Navigation)
+    google.accounts.id.renderButton(document.getElementById('google-btn'), {
+      theme: 'outline',
+      size: 'large',
+    });
+  }
 
-  onSignIn(googleUser:any) {
-  let profile = googleUser.getBasicProfile();
-  console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-  console.log('Name: ' + profile.getName());
-  console.log('Image URL: ' + profile.getImageUrl());
-  console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-}
+  handleCredentialResponse(response: any) {
+    this._nav.user.set(response.credential);
+    const userInfo = this.decodeToken(this._nav.user());
+    console.log('User Info :', userInfo);
+    console.log('token :', response.credential);
+    console.log('Nom :', userInfo.name);
+    console.log('Email :', userInfo.email);
+    console.log('Photo :', userInfo.picture);
+  }
 
+  decodeToken(token: string) {
+    return JSON.parse(atob(token.split('.')[1]));
+  }
 }
