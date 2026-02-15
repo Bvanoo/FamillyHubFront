@@ -1,41 +1,80 @@
-<div class="app">
-    <main class="content">
+<div class="groups-container">
+  
+  <div class="tabs">
+    <button (click)="activeTab = 'my-groups'" [class.active]="activeTab === 'my-groups'">
+      <i class="fa fa-users"></i> Mes Groupes
+    </button>
+    <button (click)="activeTab = 'search'" [class.active]="activeTab === 'search'">
+      <i class="fa fa-search"></i> Rejoindre
+    </button>
+    <button (click)="activeTab = 'create'" [class.active]="activeTab === 'create'">
+      <i class="fa fa-plus-circle"></i> Créer
+    </button>
+  </div>
 
-        <header class="header">
-            <h1>👥 Mes groupes</h1>
-            <button class="btn-primary">+ Nouveau groupe</button>
-        </header>
+  <div *ngIf="activeTab === 'my-groups'" class="tab-content">
+    <h2>Mes Communautés</h2>
+    
+    <div class="card-grid" *ngIf="myGroups.length > 0; else noGroup">
+      <div class="card" *ngFor="let group of myGroups">
+        <div class="card-header">{{ group.name }}</div>
+        <div class="card-body">
+          <p>Créé le {{ group.createdAt | date:'shortDate' }}</p>
+          <button class="btn-primary">Voir le Calendrier</button>
+        </div>
+      </div>
+    </div>
 
-        <section class="store-grid">
+    <ng-template #noGroup>
+      <div style="text-align: center; color: #888; padding: 40px;">
+        <p>Vous n'avez pas encore de groupe.</p>
+        <button (click)="activeTab = 'search'" style="color: #117ebd; background: none; border: none; text-decoration: underline; cursor: pointer;">Rejoindre un groupe existant</button>
+      </div>
+    </ng-template>
+  </div>
 
-            <div class="store-card">
-                <img src="https://picsum.photos/200/300" alt="">
-                <div class="store-body">
-                    <h3>Famille</h3>
-                    <span class="category">Groupe</span>
-                    <p>Espace famille et proches</p>
-                </div>
-            </div>
+  <div *ngIf="activeTab === 'search'" class="tab-content">
+    <h2>Trouver un groupe</h2>
+    <div class="search-bar">
+      <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="search()" placeholder="Nom du groupe (ex: Poker, Famille)...">
+      <button (click)="search()">🔍</button>
+    </div>
+    
+    <div class="list-results">
+      <div *ngFor="let group of searchResults" class="result-item">
+        <div>
+          <strong>{{ group.name }}</strong>
+          <div style="font-size: 0.8rem; color: #666">{{ group.description || 'Pas de description' }}</div>
+        </div>
+        <button (click)="joinGroup(group)">Rejoindre</button>
+      </div>
+      
+      <p *ngIf="searchResults.length === 0 && searchQuery" style="text-align: center; color: #999;">Aucun groupe trouvé.</p>
+    </div>
+  </div>
 
-            <div class="store-card">
-                <img src="https://picsum.photos/200/300" alt="">
-                <div class="store-body">
-                    <h3>Amis</h3>
-                    <span class="category">Social</span>
-                    <p>Discussions & sorties</p>
-                </div>
-            </div>
-
-            <div class="store-card">
-                <img src="https://picsum.photos/200/300" alt="">
-                <div class="store-body">
-                    <h3>Travail</h3>
-                    <span class="category">Professionnel</span>
-                    <p>Équipe & projets</p>
-                </div>
-            </div>
-
-        </section>
-    </main>
-    <span> </span>
+  <div *ngIf="activeTab === 'create'" class="tab-content">
+    <h2>Créer une nouvelle tribu</h2>
+    <form (ngSubmit)="createGroup()">
+      <div class="form-group">
+        <label>Nom du groupe</label>
+        <input [(ngModel)]="newGroup.name" name="name" placeholder="Ex: Les Cousins, Club Rando..." required>
+      </div>
+      
+      <div class="form-group">
+        <label>Description</label>
+        <textarea [(ngModel)]="newGroup.description" name="desc" placeholder="Quel est le but de ce groupe ?" rows="3"></textarea>
+      </div>
+      
+      <div class="checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="newGroup.isPublic" name="public"> 
+          <strong>Groupe Public</strong> 
+          <span style="font-size: 0.8rem; color: #666; margin-left: 5px;">(Visible dans la recherche)</span>
+        </label>
+      </div>
+      
+      <button type="submit">Créer le groupe</button>
+    </form>
+  </div>
 </div>
