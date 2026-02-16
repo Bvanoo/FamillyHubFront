@@ -2,8 +2,12 @@ import { HttpInterceptorFn } from '@angular/common/http';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = localStorage.getItem('token');
-
-  console.log('Intercepteur - Token trouvé :', token ? 'OUI' : 'NON');
+  
+  const excludedUrls = ['/login', '/register'];
+  
+  if (excludedUrls.some(url => req.url.toLowerCase().includes(url))) {
+    return next(req);
+  }
 
   if (token) {
     const cloned = req.clone({

@@ -9,10 +9,13 @@ export class Navigation {
   _router = inject(Router);
   _location = inject(Location);
  
+  isVisible = signal(true);
   userName= signal("");
   user= signal("");
-
-
+  
+  
+  show() { this.isVisible.set(true); }
+  hide() { this.isVisible.set(false); }
   goBack(): void {
     this._location.back();
   }

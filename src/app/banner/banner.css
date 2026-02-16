@@ -73,10 +73,6 @@
   margin-right: 10px;
 }
 
-/* ============================= */
-/* SIDEBAR FOOTER */
-/* ============================= */
-
 .sidebar-footer {
   padding-top: 20px;
   border-top: 1px solid #eee;
@@ -105,4 +101,8 @@
   font-size: 0.75rem;
   color: #00b894;
   margin: 0;
+}
+
+.logout-link{
+  cursor: pointer;
 }
