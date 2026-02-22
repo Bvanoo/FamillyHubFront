@@ -75,7 +75,7 @@ tempEvent = {
   }
 
   loadMyGroups() {
-    this._groupService.getMyGroups(this.userId).subscribe(groups => this.myGroups = groups);
+    this._groupService.getMyGroups().subscribe(groups => this.myGroups = groups);
   }
 
 handleSelect(selectInfo: DateSelectArg) {

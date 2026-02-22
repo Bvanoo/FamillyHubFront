@@ -6,7 +6,7 @@
     <h1>Bienvenue sur <span>FamilyHub</span></h1>
     <p>Connectez-vous pour continuer</p>
 
-    <form class="login-form" (ngSubmit)="onLogin()">
+    <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()">
       
       <div class="form-group">
         <label for="email">Email</label>
@@ -15,10 +15,12 @@
           <input 
             type="email" 
             id="email" 
-            name="email" 
-            [(ngModel)]="loginData.email" 
-            placeholder="papa@exemple.com" 
-            required>
+            formControlName="email" 
+            placeholder="papa@exemple.com">
+        </div>
+        <div *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid" class="error-message">
+          <small *ngIf="loginForm.get('email')?.hasError('required')">L'email est requis.</small>
+          <small *ngIf="loginForm.get('email')?.hasError('email')">Le format de l'email est invalide.</small>
         </div>
       </div>
 
@@ -29,10 +31,11 @@
           <input 
             type="password" 
             id="password" 
-            name="password" 
-            [(ngModel)]="loginData.password" 
-            placeholder="••••••••" 
-            required>
+            formControlName="password" 
+            placeholder="••••••••">
+        </div>
+        <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="error-message">
+          <small *ngIf="loginForm.get('password')?.hasError('required')">Le mot de passe est requis.</small>
         </div>
       </div>
 
@@ -43,7 +46,7 @@
         <a (click)="_nav.goToNouveaumdp()" class="forgot-password">Mot de passe oublié ?</a>
       </div>
 
-      <button type="submit" class="btn-login">C'est parti !</button>
+      <button type="submit" class="btn-login" [disabled]="loginForm.invalid">C'est parti !</button>
 
     </form>
 

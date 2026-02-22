@@ -1,28 +1,42 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Group } from '../models/interfaces';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class GroupService {
   private http = inject(HttpClient);
-  private apiUrl = 'https://localhost:7075/api/group';
-  
-  getMyGroups(userId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/my-groups/${userId}`);
+  private apiUrl = 'https://localhost:7075/api/Group';
+
+  createGroup(data: { name: string, description?: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/create`, data);
   }
 
-  createGroup(group: any): Observable<Group> {
-    return this.http.post<Group>(this.apiUrl, group);
+  joinByCode(code: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/join/code`, JSON.stringify(code), {
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
-  searchGroups(query: string): Observable<Group[]> {
-    return this.http.get<Group[]>(`${this.apiUrl}/search?query=${query}`);
+  requestJoin(groupId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/join/request/${groupId}`, {});
   }
 
-  joinGroup(groupId: number, userId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${groupId}/invite/${userId}`, {});
+  getMyGroups(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/my-groups`);
+  }
+
+  getGroupMessages(groupId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${groupId}/messages`);
+  }
+  getGroupMembers(groupId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${groupId}/members`);
+  }
+
+  deleteGroup(groupId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${groupId}`);
+  }
+
+  transferAdmin(groupId: number, newOwnerId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${groupId}/transfer/${newOwnerId}`, {});
   }
 }

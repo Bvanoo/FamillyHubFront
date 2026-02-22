@@ -1,6 +1,7 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { GroupService } from '../Services/group-service';
 
 @Component({
@@ -8,77 +9,70 @@ import { GroupService } from '../Services/group-service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './groupes.html',
-  styleUrls: ['./groupes.css'],
+  styleUrls: ['./groupes.css']
 })
 export class Groupes implements OnInit {
   private groupService = inject(GroupService);
-  
-  userId = 1; 
-  myGroups: any[] = [];
-  searchResults: any[] = [];
-  searchQuery = '';
-  activeTab: 'my-groups' | 'search' | 'create' = 'my-groups';
-  newGroup = { 
-    name: '', 
-    description: '', 
-    isPublic: true, 
-    ownerId: 0,
-    iconUrl: 'assets/icons/house.png'
-  };
+  private router = inject(Router);
+  activeTab = signal<string>('my-groups');
+  myGroups = signal<any[]>([]);
+  searchResults = signal<any[]>([]);
+  creationError = signal<string>(''); 
+  searchQuery: string = '';
+  newGroup = { name: '', description: '', isPublic: true };
 
   ngOnInit() {
     this.loadMyGroups();
-    this.newGroup.ownerId = this.userId;
   }
 
   loadMyGroups() {
-    this.groupService.getMyGroups(this.userId).subscribe(groups => {
-      this.myGroups = groups;
+    this.groupService.getMyGroups().subscribe({
+      next: (groups) => this.myGroups.set(groups),
+      error: (err) => console.error("Erreur de chargement", err)
     });
   }
 
+  selectGroup(group: any) {
+    this.router.navigate(['/groupe', group.id]);
+  }
+
   search() {
-    if (!this.searchQuery.trim()) return;
-    this.groupService.searchGroups(this.searchQuery).subscribe(results => {
-      this.searchResults = results;
+    if (!this.searchQuery.trim()) {
+      this.searchResults.set([]);
+      return;
+    }
+    
+    const filtered = this.myGroups().filter(g => 
+      g.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+    );
+    this.searchResults.set(filtered);
+  }
+
+  joinGroup(group: any) {
+    this.groupService.requestJoin(group.id).subscribe({
+      next: () => alert("Demande envoyée pour le groupe " + group.name),
+      error: (err) => alert(err.error?.message || "Erreur lors de la demande")
     });
   }
 
   createGroup() {
-    this.newGroup.ownerId = this.userId;
-    if (!this.newGroup.iconUrl) {
-        this.newGroup.iconUrl = 'assets/icons/default.png';
-    }
+    this.creationError.set(''); 
+    if (!this.newGroup.name.trim()) return;
 
-    this.groupService.createGroup(this.newGroup).subscribe({
-      next: (g) => {
-        alert('Groupe créé avec succès !');
-        this.activeTab = 'my-groups';
+    this.groupService.createGroup({ 
+      name: this.newGroup.name, 
+      description: this.newGroup.description 
+    }).subscribe({
+      next: (group) => {
+        alert("Groupe créé avec succès ! Code : " + group.inviteCode);
+        this.newGroup = { name: '', description: '', isPublic: true };
+        this.activeTab.set('my-groups');
         this.loadMyGroups();
-        this.newGroup = { 
-            name: '', 
-            description: '', 
-            isPublic: true, 
-            ownerId: this.userId,
-            iconUrl: 'assets/icons/house.png' 
-        };
       },
-      error: (e) => {
-        console.error('Erreur création groupe:', e);
-        alert('Erreur lors de la création. Vérifiez les champs.');
+      error: (err) => {
+        console.error("Erreur complète :", err);
+        this.creationError.set(err.error?.message || err.message || "Erreur serveur");
       }
     });
-  }
-
-  joinGroup(group: any) {
-    if(confirm(`Rejoindre "${group.name}" ?`)) {
-      this.groupService.joinGroup(group.id, this.userId).subscribe({
-        next: () => {
-          alert('Demande envoyée !');
-          this.loadMyGroups();
-        },
-        error: (err) => alert("Erreur ou déjà membre")
-      });
-    }
   }
 }

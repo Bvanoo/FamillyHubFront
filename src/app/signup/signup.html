@@ -1,14 +1,19 @@
-<div class="login-container"> <div class="login-card">
+<div class="login-container"> 
+  <div class="login-card">
     <h1>Rejoindre la <span>Famille</span></h1>
     <p>Créez votre espace FamilyHub</p>
     
-    <form class="login-form" (ngSubmit)="onSignup()">
+    <form class="login-form" [formGroup]="signupForm" (ngSubmit)="onSignup()">
       
       <div class="form-group">
         <label>Nom / Prénom</label>
         <div class="input-wrapper">
           <i class="fas fa-user"></i>
-          <input type="text" name="name" [(ngModel)]="signupData.name" placeholder="Votre nom" required>
+          <input type="text" formControlName="name" placeholder="Votre nom">
+        </div>
+        <div *ngIf="signupForm.get('name')?.touched && signupForm.get('name')?.invalid" class="error-message">
+          <small *ngIf="signupForm.get('name')?.hasError('required')">Le nom est requis.</small>
+          <small *ngIf="signupForm.get('name')?.hasError('minlength')">Le nom doit faire au moins 2 caractères.</small>
         </div>
       </div>
       
@@ -16,7 +21,11 @@
         <label>Email</label>
         <div class="input-wrapper">
           <i class="fas fa-envelope"></i>
-          <input type="email" name="email" [(ngModel)]="signupData.email" placeholder="exemple@mail.com" required>
+          <input type="email" formControlName="email" placeholder="exemple@mail.com">
+        </div>
+        <div *ngIf="signupForm.get('email')?.touched && signupForm.get('email')?.invalid" class="error-message">
+          <small *ngIf="signupForm.get('email')?.hasError('required')">L'email est requis.</small>
+          <small *ngIf="signupForm.get('email')?.hasError('email')">Le format de l'email est invalide.</small>
         </div>
       </div>
 
@@ -24,7 +33,11 @@
         <label>Mot de passe</label>
         <div class="input-wrapper">
           <i class="fas fa-lock"></i>
-          <input type="password" name="password" [(ngModel)]="signupData.password" placeholder="••••••••" required>
+          <input type="password" formControlName="password" placeholder="••••••••">
+        </div>
+        <div *ngIf="signupForm.get('password')?.touched && signupForm.get('password')?.invalid" class="error-message">
+          <small *ngIf="signupForm.get('password')?.hasError('required')">Le mot de passe est requis.</small>
+          <small *ngIf="signupForm.get('password')?.hasError('minlength')">Le mot de passe doit contenir au moins 8 caractères.</small>
         </div>
       </div>
 
@@ -32,11 +45,14 @@
         <label>Confirmer Mot de passe</label>
         <div class="input-wrapper">
           <i class="fas fa-check-circle"></i>
-          <input type="password" name="confirmPassword" [(ngModel)]="signupData.confirmPassword" placeholder="••••••••" required>
+          <input type="password" formControlName="confirmPassword" placeholder="••••••••">
+        </div>
+        <div *ngIf="(signupForm.get('confirmPassword')?.touched || signupForm.get('password')?.touched) && signupForm.hasError('mismatch')" class="error-message">
+          <small>Les mots de passe ne correspondent pas.</small>
         </div>
       </div>
 
-      <button type="submit" class="btn-login">S'inscrire</button>
+      <button type="submit" class="btn-login" [disabled]="signupForm.invalid">S'inscrire</button>
     </form>
     
     <div class="login-footer">

@@ -70,4 +70,14 @@ export class AuthService {
 
     return this.http.post(`${this.apiUrl}/update-profile/${userId}`, formData);
   }
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  isAuthenticated(): boolean {
+    const token = this.getToken();
+    return !!token; 
+  }
+
 }

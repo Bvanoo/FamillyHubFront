@@ -3,28 +3,37 @@
 
     <div class="login-header">
       <div class="logo-circle">
-        <img src="FamHubIcon.png" alt="">
+        <img src="FamHubIcon.png" alt="Logo">
       </div>
-      <div class="login-container">
-  <div class="login-card">
+    </div>
+
     <h1>Mot de passe <span>oublié</span></h1>
     <p>Entrez votre email pour recevoir un lien.</p>
 
-    <form (ngSubmit)="onSubmit()">
+    <form [formGroup]="forgotPasswordForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label>Email</label>
-        <input type="email" name="email" [(ngModel)]="email" required>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope"></i>
+          <input type="email" formControlName="email" placeholder="exemple@mail.com">
+        </div>
+        
+        <div *ngIf="forgotPasswordForm.get('email')?.touched && forgotPasswordForm.get('email')?.invalid" class="error-message">
+          <small *ngIf="forgotPasswordForm.get('email')?.hasError('required')">L'email est requis.</small>
+          <small *ngIf="forgotPasswordForm.get('email')?.hasError('email')">Le format de l'email est invalide.</small>
+        </div>
       </div>
 
-      <button type="submit" class="btn-login">Envoyer</button>
+      <button type="submit" class="btn-login" [disabled]="forgotPasswordForm.invalid">Envoyer</button>
     </form>
     
-    <p *ngIf="message" style="color: green; margin-top: 10px;">{{ message }}</p>
+    <p *ngIf="message" style="color: green; margin-top: 10px; font-weight: bold; text-align: center;">
+      {{ message }}
+    </p>
 
     <div class="login-footer">
-      <a (click)="_nav.goToLogin()">Retour à la connexion</a>
+      <a (click)="_nav.goToLogin()" style="cursor: pointer;">Retour à la connexion</a>
     </div>
-  </div>
-</div>
+    
   </div>
 </div>
