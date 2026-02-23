@@ -1,5 +1,9 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 
+/**
+ * Adds a Bearer authentication token to outgoing HTTP requests when available. Skips attaching
+ * the token for authentication-related endpoints such as login and registration.
+ */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = localStorage.getItem('token');
   

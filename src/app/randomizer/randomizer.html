@@ -12,30 +12,40 @@
         <h2>Configuration</h2>
         
         <div class="mode-selector">
-          <button class="mode-btn active">
+          <button class="mode-btn" [class.active]="mode() === 'cacahuete'" (click)="setMode('cacahuete')">
             <span class="icon">🥜</span>
             <strong>Cacahuète</strong>
-            <small>Tirage croisé</small>
+            <small>Tirage croisé secret</small>
           </button>
-          <button class="mode-btn">
+          
+          <button class="mode-btn" [class.active]="mode() === 'tache'" (click)="setMode('tache')">
             <span class="icon">📋</span>
             <strong>Tâche</strong>
-            <small>Assigner un élu</small>
+            <small>Assigner un élu au hasard</small>
           </button>
         </div>
 
         <div class="setup-area">
           <div class="input-group">
             <label>Titre de l'événement</label>
-            <input type="text" placeholder="Ex: Noël en famille...">
+            <input type="text" [ngModel]="eventTitle()" (ngModelChange)="eventTitle.set($event)" placeholder="Ex: Noël en famille...">
           </div>
           
           <div class="result-placeholder">
-            <p>Sélectionnez un groupe et lancez le tirage</p>
+            @if (drawResult()) {
+              <p class="winner-text" [class.drawing]="isDrawing()">
+                {{ mode() === 'tache' ? 'L\'élu(e) est : ' : 'Simulation...' }} 
+                <strong>{{ drawResult() }}</strong> 🎉
+              </p>
+            } @else {
+              <p>Sélectionnez un groupe et lancez le tirage</p>
+            }
           </div>
         </div>
 
-        <button class="btn-primary btn-launch">Lancer le tirage</button>
+        <button class="btn-primary btn-launch" [disabled]="isDrawing()" (click)="launchDraw()">
+          {{ isDrawing() ? 'Tirage en cours...' : 'Lancer le tirage' }}
+        </button>
       </div>
 
       <div class="card groups-panel">
@@ -46,18 +56,27 @@
         <div class="groups-selection-area">
           <div class="input-group">
             <label for="group-picker">Groupe actif</label>
-            <select id="group-picker" class="group-select">
+            <select id="group-picker" class="group-select" (change)="onGroupChange($event)">
               <option value="" disabled selected>-- Choisir un groupe --</option>
-              <option value="famille">🏠 Famille</option>
-              <option value="bureau">💼 Bureau</option>
-              <option value="sport">🏀 Club Sport</option>
+              
+              @for (group of groups; track group.id) {
+                <option [value]="group.id">{{ group.name }}</option>
+              }
             </select>
           </div>
 
           <div class="participants-list-container">
-            <h3>Membres du groupe</h3>
+            <h3>Membres du groupe ({{ currentMembers.length }})</h3>
             <ul id="participants-list" class="members-display">
-              <li class="placeholder-text">Aucun groupe sélectionné</li>
+              
+              @if (currentMembers.length === 0) {
+                <li class="placeholder-text">Aucun groupe sélectionné</li>
+              } @else {
+                @for (member of currentMembers; track member) {
+                  <li>👤 {{ member }}</li>
+                }
+              }
+
             </ul>
           </div>
         </div>
@@ -67,5 +86,4 @@
 
     </section>
   </main>
-  <span> </span>
 </div>

@@ -20,7 +20,7 @@
         <div class="card-header">{{ group.name }}</div>
         <div class="card-body">
           <p style="font-size: 0.9rem; color: #555;">{{ group.description || 'Pas de description' }}</p>
-          <button class="btn-primary" (click)="selectGroup(group)">Entrer dans le groupe</button>
+          <button class="btn-primary" (click)="_nav.goToGroupDetail(group.id)">Entrer dans le groupe</button>
         </div>
       </div>
     </div>

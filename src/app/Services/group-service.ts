@@ -3,40 +3,115 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
+/**
+ * Centralizes all backend interactions related to user groups and their membership.
+ * Exposes operations for creating, joining, managing, and querying groups, members, and group messages.
+ */
 export class GroupService {
-  private http = inject(HttpClient);
-  private apiUrl = 'https://localhost:7075/api/Group';
+  private readonly _http = inject(HttpClient);
+  private readonly _apiUrl = 'https://localhost:7075/api/Group';
 
-  createGroup(data: { name: string, description?: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/create`, data);
+  /**
+   * Creates a new group with the provided metadata.
+   *
+   * Args:
+   *   data: Basic details of the group, including its name and optional description.
+   *
+   * Returns:
+   *   An observable emitting the server's response with group information.
+   */
+  createGroup(data: { name: string; description?: string }): Observable<any> {
+    return this._http.post(`${this._apiUrl}/create`, data);
   }
 
+  /**
+   * Attempts to join a group using an invite or access code.
+   *
+   * Args:
+   *   code: The code identifying the group to join.
+   *
+   * Returns:
+   *   An observable emitting the result of the join attempt.
+   */
   joinByCode(code: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/join/code`, JSON.stringify(code), {
-      headers: { 'Content-Type': 'application/json' }
+    return this._http.post(`${this._apiUrl}/join/code`, JSON.stringify(code), {
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 
+  /**
+   * Sends a join request for a specific group, typically pending admin approval.
+   *
+   * Args:
+   *   groupId: The identifier of the group to request membership in.
+   *
+   * Returns:
+   *   An observable emitting the server's acknowledgement of the request.
+   */
   requestJoin(groupId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/join/request/${groupId}`, {});
+    return this._http.post(`${this._apiUrl}/join/request/${groupId}`, {});
   }
 
+  /**
+   * Retrieves the list of groups the current user belongs to.
+   *
+   * Returns:
+   *   An observable emitting an array of groups associated with the user.
+   */
   getMyGroups(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/my-groups`);
+    return this._http.get<any[]>(`${this._apiUrl}/my-groups`);
   }
 
+  /**
+   * Fetches the message history for a given group.
+   *
+   * Args:
+   *   groupId: The identifier of the group whose messages are requested.
+   *
+   * Returns:
+   *   An observable emitting an array of group messages.
+   */
   getGroupMessages(groupId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/${groupId}/messages`);
+    return this._http.get<any[]>(`${this._apiUrl}/${groupId}/messages`);
   }
+  /**
+   * Retrieves the members associated with a specific group.
+   *
+   * Args:
+   *   groupId: The identifier of the group whose members should be returned.
+   *
+   * Returns:
+   *   An observable emitting an array of group member records.
+   */
   getGroupMembers(groupId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/${groupId}/members`);
+    return this._http.get<any[]>(`${this._apiUrl}/${groupId}/members`);
   }
-
+  /**
+   * Permanently deletes a group identified by its ID.
+   *
+   * Args:
+   *   groupId: The identifier of the group to delete.
+   *
+   * Returns:
+   *   An observable emitting the deletion result from the server.
+   */
   deleteGroup(groupId: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${groupId}`);
+    return this._http.delete(`${this._apiUrl}/${groupId}`);
   }
-
+  /**
+   * Transfers administrative ownership of a group from the current admin to another member.
+   *
+   * Args:
+   *   groupId: The identifier of the group whose admin is being changed.
+   *   newOwnerId: The identifier of the member who will become the new admin.
+   *
+   * Returns:
+   *   An observable emitting the server's response to the transfer operation.
+   */
   transferAdmin(groupId: number, newOwnerId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${groupId}/transfer/${newOwnerId}`, {});
+    return this._http.post(
+      `${this._apiUrl}/${groupId}/transfer/${newOwnerId}`,
+      {},
+    );
   }
 }
