@@ -1,0 +1,63 @@
+<div class="group-details-container" *ngIf="groupId">
+  
+  <div class="header">
+    <button class="btn-back" (click)="goBack()">⬅ Retour</button>
+    <h2>Espace du Groupe #{{ groupId }}</h2>
+  </div>
+
+  <div class="tabs">
+    <button (click)="activeTab.set('chat')" [class.active]="activeTab() === 'chat'">💬 Chat</button>
+    <button (click)="activeTab.set('calendar')" [class.active]="activeTab() === 'calendar'">📅 Calendrier</button>
+    <button (click)="activeTab.set('settings')" [class.active]="activeTab() === 'settings'">⚙️ Paramètres</button>
+  </div>
+
+  <div *ngIf="activeTab() === 'chat'" class="chat-section">
+    <div class="messages-container">
+      <div *ngFor="let msg of messages()" class="message" [class.my-message]="msg.senderName === currentUser.name">
+        <div class="msg-header">
+            <strong>{{ msg.senderName }}</strong> 
+            <small>{{ msg.timestamp | date:'shortTime' }}</small>
+        </div>
+        <p>{{ msg.content }}</p>
+      </div>
+    </div>
+    <div class="chat-input">
+      <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" placeholder="Écrivez un message...">
+      <button (click)="sendMessage()">Envoyer</button>
+    </div>
+  </div>
+
+  <div *ngIf="activeTab() === 'calendar'" class="calendar-section">
+    <h3>Calendrier du groupe</h3>
+    <p>Le calendrier partagé sera affiché ici !</p>
+  </div>
+
+  <div *ngIf="activeTab() === 'settings'" class="settings-section" style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
+    
+    <h3>Membres du groupe</h3>
+    <ul style="list-style: none; padding: 0; margin-bottom: 30px;">
+      <li *ngFor="let member of members()" style="padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <strong>{{ member.name }}</strong> 
+          <span *ngIf="member.role === 'Admin'" style="background: #ffd700; color: #333; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; margin-left: 10px;">👑 Admin</span>
+        </div>
+        
+        <button *ngIf="isAdmin() && member.userId !== currentUser.id" 
+                (click)="transferRole(member.userId, member.name)"
+                style="background: #117eba; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">
+          Nommer Admin
+        </button>
+      </li>
+    </ul>
+
+    <div *ngIf="isAdmin()" style="border: 1px solid #ff4d4f; border-radius: 8px; padding: 15px; background: #fff1f0;">
+      <h3 style="color: #c62828; margin-top: 0;">Zone de danger</h3>
+      <p style="font-size: 0.9rem; color: #555;">La suppression du groupe entraînera la perte de tous les messages et événements liés.</p>
+      <button (click)="deleteGroup()" style="background: #c62828; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+        🗑️ Supprimer le groupe
+      </button>
+    </div>
+
+  </div>
+
+</div>

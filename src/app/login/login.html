@@ -1,20 +1,26 @@
 <div class="login-container">
   <div class="login-card">
-    
-    <div class="login-header">
-      <div class="logo-circle">
-        <img src="FamHubIcon.png" alt="">
-      </div>
-      <h1>Family<span>Hub</span></h1>
-      <p>Ravi de vous revoir !</p>
+    <div class="logo">
+      <img src="FamHubIcon.png" alt="Logo" onerror="this.style.display='none'">
     </div>
+    <h1>Bienvenue sur <span>FamilyHub</span></h1>
+    <p>Connectez-vous pour continuer</p>
 
-    <form class="login-form">
+    <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()">
+      
       <div class="form-group">
         <label for="email">Email</label>
         <div class="input-wrapper">
           <i class="fas fa-envelope"></i>
-          <input type="email" id="email" placeholder="papa@exemple.com">
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email" 
+            placeholder="papa@exemple.com">
+        </div>
+        <div *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid" class="error-message">
+          <small *ngIf="loginForm.get('email')?.hasError('required')">L'email est requis.</small>
+          <small *ngIf="loginForm.get('email')?.hasError('email')">Le format de l'email est invalide.</small>
         </div>
       </div>
 
@@ -22,24 +28,30 @@
         <label for="password">Mot de passe</label>
         <div class="input-wrapper">
           <i class="fas fa-lock"></i>
-          <input type="password" id="password" placeholder="••••••••">
+          <input 
+            type="password" 
+            id="password" 
+            formControlName="password" 
+            placeholder="••••••••">
+        </div>
+        <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="error-message">
+          <small *ngIf="loginForm.get('password')?.hasError('required')">Le mot de passe est requis.</small>
         </div>
       </div>
 
-      <div class="form-options">
+      <div class="options">
         <label class="remember-me">
-          <input type="checkbox"> Souvenir de moi
+          <input type="checkbox"> Se souvenir de moi
         </label>
-        <a (click)="_nav.goToNouveaumdp()" class="forgot-link">Oublié ?</a>
+        <a (click)="_nav.goToNouveaumdp()" class="forgot-password">Mot de passe oublié ?</a>
       </div>
 
-      <button type="button" (click)="_nav.goToHome()" class="btn-login">C'est parti !</button>
-      <div id="google-btn"></div>
+      <button type="submit" class="btn-login" [disabled]="loginForm.invalid">C'est parti !</button>
 
     </form>
-    
+
     <div class="login-footer">
-      <p>Pas encore de compte ? <a (click)="_nav.goToSignup()">Rejoindre la famille</a></p>
+      <p>Pas encore de compte ? <a (click)="_nav.goToSignup()">Créer un compte</a></p>
     </div>
   </div>
 </div>

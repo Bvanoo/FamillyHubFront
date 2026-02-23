@@ -1,12 +1,14 @@
 import { inject } from '@angular/core';
-import { CanActivateFn } from '@angular/router';
-import { Navigation } from '../Services/navigation';
+import { CanActivateFn, Router } from '@angular/router';
 
-export const loginGuard: CanActivateFn = (route, state) => {
-  const _nav = inject(Navigation)
-  if (_nav.userName()){
+export const loginGuard: CanActivateFn = () => {
+  const router = inject(Router);
+  const token = localStorage.getItem('token');
+
+  if (token) {
     return true;
+  } else {
+    router.navigate(['/login']);
+    return false;
   }
-  _nav.goToLogin();
-  return false;
 };

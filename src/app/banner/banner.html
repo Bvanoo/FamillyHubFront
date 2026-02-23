@@ -23,12 +23,13 @@
     </ul>
 
     <div class="sidebar-footer">
-        <div class="user-profile" (click)="_nav.goToProfil()">
-            <img src="https://picsum.photos/200/300" alt="Profil">
-            <div class="user-info">
-                <p class="name">Jean Dupont</p>
-                <p class="status">En ligne</p>
-            </div>
+    <div class="user-profile">
+        <img [src]="currentUser?.fullPictureUrl || 'https://ui-avatars.com/api/?name=' + (currentUser?.name || 'User')" 
+             (click)="_nav.goToProfil()" alt="Profil">
+        <div class="user-info">
+            <p class="name">{{ currentUser?.name }}</p>
+            <p class="status logout-link" (click)="handleLogout()">Déconnexion</p>
         </div>
     </div>
+</div>
 </nav>

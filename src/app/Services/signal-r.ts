@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
-import { BehaviorSubject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class SignalrService {
@@ -13,37 +12,40 @@ export class SignalrService {
       return;
     }
 
+  public startConnection() {
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl('https://localhost:7075/chatHub')
-      .withAutomaticReconnect()
       .build();
 
-    this.registerOnServerEvents();
+    this.hubConnection
+      .start()
+      .then(() => console.log('✅ Connecté au ChatHub SignalR'))
+      .catch(err => console.log('❌ Erreur SignalR : ' + err));
+  }
 
-    try {
-      await this.hubConnection.start();
-      console.log('Connexion SignalR établie avec succès !');
-    } catch (err) {
-      console.error('Erreur lors de la connexion SignalR :', err);
-      throw err;
+  public joinGroup(groupId: number) {
+    if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection.invoke("JoinGroupHub", groupId.toString())
+        .catch(err => console.error("Erreur JoinGroup:", err));
     }
   }
 
-  private registerOnServerEvents(): void {
-    this.hubConnection.on('ReceiveMessage', (senderId: number, content: string, createdAt: Date) => {
-      this.messageReceivedSubject.next({ senderId, content, createdAt });
-    });
-  }
-
-  public joinConversation(conversationId: number): void {
-    if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
-      this.hubConnection.invoke('JoinConversation', conversationId)
-        .catch(err => console.error('Erreur JoinConversation :', err));
+  public leaveGroup(groupId: number) {
+    if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection.invoke("LeaveGroupHub", groupId.toString())
+        .catch(err => console.error("Erreur LeaveGroup:", err));
     }
   }
 
-  public sendMessage(conversationId: number, senderId: number, content: string): void {
-    this.hubConnection.invoke('SendMessage', conversationId, senderId, content)
-      .catch(err => console.error('Erreur SendMessage :', err));
+  public sendMessageToGroup(groupId: number, message: string, senderId: string, senderName: string) {
+    if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection.invoke("SendMessageToGroup", groupId.toString(), message, senderId, senderName)
+        .catch(err => console.error("Erreur SendMessage:", err));
+    }
+  }
+
+  public addMessageListener(callback: (senderName: string, message: string, timestamp: string) => void) {
+    this.hubConnection.off("ReceiveMessage"); 
+    this.hubConnection.on("ReceiveMessage", callback);
   }
 }

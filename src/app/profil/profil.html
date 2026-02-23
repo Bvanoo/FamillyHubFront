@@ -2,86 +2,51 @@
   <main class="content">
     <header class="header">
       <h1>👤 Mon Profil</h1>
-      <button class="btn-primary">Enregistrer les modifications</button>
+      <button class="btn-logout" (click)="logout()">Se déconnecter</button>
     </header>
 
     <div class="profile-grid">
       
       <aside class="profile-sidebar">
         <div class="card avatar-card">
-          <div class="avatar-wrapper">
-            <img src="https://via.placeholder.com/150" alt="Avatar" id="user-avatar">
-            <label for="avatar-upload" class="btn-edit-avatar">
-              <span>📷</span>
-              <input type="file" id="avatar-upload" hidden>
-            </label>
+          <div class="avatar-wrapper" (click)="fileInput.click()" title="Cliquez pour changer la photo">
+            
+            <img [src]="urlPic()"
+                 alt="Avatar" 
+                 id="user-avatar">
+            
+            <div class="avatar-overlay">
+              <i class="fas fa-camera"></i>
+            </div>
           </div>
-          <h2>John Doe</h2>
-          <p>Membre depuis Janvier 2024</p>
-        </div>
+          
+          <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none;">
 
-        <div class="card visibility-card">
-          <h3>Visibilité</h3>
-          <div class="status-options">
-            <label class="status-item">
-              <input type="radio" name="visibility" value="dispo" checked>
-              <div class="status-content">
-                <span class="status-dot dispo"></span>
-                <span>Disponible</span>
-              </div>
-            </label>
-            <label class="status-item">
-              <input type="radio" name="visibility" value="inactif">
-              <div class="status-content">
-                <span class="status-dot inactif"></span>
-                <span>Inactif</span>
-              </div>
-            </label>
-            <label class="status-item">
-              <input type="radio" name="visibility" value="invisible">
-              <div class="status-content">
-                <span class="status-dot invisible"></span>
-                <span>Invisible</span>
-              </div>
-            </label>
-          </div>
+          <h2>{{ userData().name }}</h2>
+          <p>Membre FamilyHub</p>
         </div>
       </aside>
 
       <section class="profile-details">
         <div class="card">
           <h3>Informations personnelles</h3>
-          <div class="form-row">
-            <div class="input-group">
-              <label>Prénom</label>
-              <input type="text" value="John">
-            </div>
-            <div class="input-group">
-              <label>Nom</label>
-              <input type="text" value="Doe">
-            </div>
+          
+          <div class="input-group">
+            <label>Nom complet</label>
+            <input type="text" name="name" [(ngModel)]="formName">
           </div>
+
           <div class="input-group">
             <label>E-mail</label>
-            <input type="email" value="john.doe@example.com">
+            <input type="email" name="email" [value]="userData().email" readonly class="readonly-input">
           </div>
-          <div class="input-group">
-            <label>Téléphone</label>
-            <input type="tel" value="+33 6 12 34 56 78">
-          </div>
-        </div>
 
-        <div class="card security-card">
-          <h3>Sécurité</h3>
-          <p class="section-desc">Modifiez votre mot de passe pour sécuriser votre compte.</p>
-          <div class="input-group">
-            <label>Nouveau mot de passe</label>
-            <input type="password" placeholder="••••••••">
+          <div class="actions">
+            <button class="btn-save" (click)="saveChanges()" [disabled]="isSaving">
+              {{ isSaving ? 'Sauvegarde...' : 'Enregistrer les modifications' }}
+            </button>
           </div>
-          <div class="input-group">
-            <label>Confirmer le mot de passe</label>
-            <input type="password" placeholder="••••••••">
-          </div>
+
         </div>
       </section>
 

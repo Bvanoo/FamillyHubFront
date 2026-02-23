@@ -1,39 +1,56 @@
-import { AfterViewInit, Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Navigation } from '../Services/navigation';
-declare let google: any;
+import { AuthService } from '../Services/auth-service';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.html',
-  styleUrl: './login.css',
+  styleUrls: ['./login.css']
 })
-export class Login implements AfterViewInit {
+export class Login implements OnInit {
+  private authService = inject(AuthService);
+  private fb = inject(FormBuilder);
   _nav = inject(Navigation);
-  ngAfterViewInit() {
-    google.accounts.id.initialize({
-      client_id:
-        '123887637516-givp4aionno6svukrfksbvva00640rj5.apps.googleusercontent.com',
-      callback: this.handleCredentialResponse.bind(this),
-    });
 
-    google.accounts.id.renderButton(document.getElementById('google-btn'), {
-      theme: 'outline',
-      size: 'large',
+  loginForm: FormGroup;
+
+  constructor() {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]]
     });
   }
 
-  handleCredentialResponse(response: any) {
-    this._nav.user.set(response.credential);
-    const userInfo = this.decodeToken(this._nav.user());
-    console.log('User Info :', userInfo);
-    console.log('token :', response.credential);
-    console.log('Nom :', userInfo.name);
-    console.log('Email :', userInfo.email);
-    console.log('Photo :', userInfo.picture);
+  ngOnInit() {
+    this._nav.hide();
   }
 
-  decodeToken(token: string) {
-    return JSON.parse(atob(token.split('.')[1]));
+  onLogin() {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
+
+    this.authService.login(this.loginForm.value).subscribe({
+      next: (res) => {
+        this.authService.saveSession(res);
+
+        if (typeof this._nav.show === 'function') {
+          this._nav.show(); 
+        } else { 
+          this._nav.show();
+        }
+
+        this._nav.goToHome();
+      },
+      error: (err) => {
+        console.error(err);
+        alert("Erreur : " + (err.error?.message || "Email ou mot de passe incorrect"));
+      }
+    });
   }
 }

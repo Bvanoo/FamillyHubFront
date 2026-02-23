@@ -3,35 +3,37 @@
 
     <div class="login-header">
       <div class="logo-circle">
-        <img src="FamHubIcon.png" alt="">
+        <img src="FamHubIcon.png" alt="Logo">
       </div>
-      <h1>Family<span>Hub</span></h1>
-      <p>Récupération du mot de passe</p>
     </div>
 
-    <form class="login-form">
+    <h1>Mot de passe <span>oublié</span></h1>
+    <p>Entrez votre email pour recevoir un lien.</p>
 
+    <form [formGroup]="forgotPasswordForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
-        <label for="email">Email</label>
+        <label>Email</label>
         <div class="input-wrapper">
           <i class="fas fa-envelope"></i>
-          <input type="email" id="email" placeholder="famille@exemple.com">
+          <input type="email" formControlName="email" placeholder="exemple@mail.com">
         </div>
-        <small class="helper-text">
-          Un lien de réinitialisation vous sera envoyé
-        </small>
+        
+        <div *ngIf="forgotPasswordForm.get('email')?.touched && forgotPasswordForm.get('email')?.invalid" class="error-message">
+          <small *ngIf="forgotPasswordForm.get('email')?.hasError('required')">L'email est requis.</small>
+          <small *ngIf="forgotPasswordForm.get('email')?.hasError('email')">Le format de l'email est invalide.</small>
+        </div>
       </div>
 
-      <button type= "button" (click)="_nav.goBack()" class="btn-login">
-        Envoyer le lien
-      </button>
+      <button type="submit" class="btn-login" [disabled]="forgotPasswordForm.invalid">Envoyer</button>
     </form>
+    
+    <p *ngIf="message" style="color: green; margin-top: 10px; font-weight: bold; text-align: center;">
+      {{ message }}
+    </p>
 
     <div class="login-footer">
-      <p>
-        <a (click)="_nav.goBack()">Retour à la connexion</a>
-      </p>
+      <a (click)="_nav.goToLogin()" style="cursor: pointer;">Retour à la connexion</a>
     </div>
-
+    
   </div>
 </div>

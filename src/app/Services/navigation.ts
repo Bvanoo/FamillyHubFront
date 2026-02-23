@@ -11,8 +11,10 @@ export class Navigation {
  
   userName= signal("geg");
   user= signal("");
-
-
+  
+  
+  show() { this.isVisible.set(true); }
+  hide() { this.isVisible.set(false); }
   goBack(): void {
     this._location.back();
   }
