@@ -8,9 +8,8 @@ export class SignalrService {
   private readonly messageReceivedSubject = new BehaviorSubject<{senderId: number, content: string, createdAt: Date} | null>(null);
   public messageReceived$ = this.messageReceivedSubject.asObservable();
 
-  constructor() {}
   public async startConnection(): Promise<void> {
-    if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
+    if (this.hubConnection?.state === signalR.HubConnectionState.Connected) {
       return;
     }
 

@@ -2,10 +2,6 @@
   <main class="content-area">
     <header class="page-header">
       <h1>📅 Planning & Dispos</h1>
-      <div class="header-actions">
-        <button class="btn-secondary">Exporter</button>
-        <button class="btn-primary" (click)="saveToDatabase()">Enregistrer en base</button>
-      </div>
     </header>
 
     <section class="calendar-layout">
@@ -53,40 +49,60 @@
           <label>Motif (Optionnel)</label>
           <input type="text" class="custom-input" [(ngModel)]="tempEvent.title" placeholder="Ex: Congés, Formation...">
         </div>
+        <div class="input-group">
+          <label>Plage horaire</label>
+          <div class="time-range-container">
+            <select class="custom-input time-select" [(ngModel)]="selectedStartTime"
+              (ngModelChange)="onStartTimeChange()">
+              <option *ngFor="let time of timeSlots" [value]="time">
+                {{ time }}
+              </option>
+            </select>
 
-        <div class="color-picker-group">
-          <label>Couleurs rapides (Légende)</label>
-          <div class="color-presets">
-            <div class="color-swatch" [style.background-color]="'#3b82f6'"
-              [class.active]="tempEvent.color === '#3b82f6'" (click)="tempEvent.color = '#3b82f6'">
-            </div>
-            <div class="color-swatch" [style.background-color]="'#10b981'"
-              [class.active]="tempEvent.color === '#10b981'" (click)="tempEvent.color = '#10b981'">
-            </div>
-            <div class="color-swatch" [style.background-color]="'#f59e0b'"
-              [class.active]="tempEvent.color === '#f59e0b'" (click)="tempEvent.color = '#f59e0b'">
-            </div>
-          </div>
+            <span class="time-separator">à</span>
 
-          <div class="custom-color-section">
-            <label>Couleur personnalisée</label>
-            <input type="color" class="rect-color-input" [(ngModel)]="tempEvent.color" name="colorPicker">
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button *ngIf="isEditMode" class="btn-danger" (click)="deleteEvent()">
-            Supprimer
-          </button>
-
-          <div class="right-actions">
-            <button class="btn-cancel" (click)="closeModal()">Annuler</button>
-            <button class="btn-primary" (click)="saveEvent()">
-              {{ isEditMode ? 'Mettre à jour' : 'Créer l\'événement' }}
-            </button>
+            <select class="custom-input time-select" [(ngModel)]="selectedEndTime">
+              <option *ngFor="let time of getAvailableEndSlots()" [value]="time">
+                {{ time }}
+              </option>
+            </select>
           </div>
         </div>
-
       </div>
+
+      <div class="color-picker-group">
+        <label>Couleurs rapides (Légende)</label>
+        <div class="color-presets">
+          <div class="color-swatch" [style.background-color]="'#3b82f6'" [class.active]="tempEvent.color === '#3b82f6'"
+            (click)="tempEvent.color = '#3b82f6'">
+          </div>
+          <div class="color-swatch" [style.background-color]="'#10b981'" [class.active]="tempEvent.color === '#10b981'"
+            (click)="tempEvent.color = '#10b981'">
+          </div>
+          <div class="color-swatch" [style.background-color]="'#f59e0b'" [class.active]="tempEvent.color === '#f59e0b'"
+            (click)="tempEvent.color = '#f59e0b'">
+          </div>
+        </div>
+
+        <div class="custom-color-section">
+          <label>Couleur personnalisée</label>
+          <input type="color" class="rect-color-input" [(ngModel)]="tempEvent.color" name="colorPicker">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button *ngIf="isEditMode" class="btn-danger" (click)="deleteEvent()">
+          Supprimer
+        </button>
+
+        <div class="right-actions">
+          <button class="btn-cancel" (click)="closeModal()"></button>
+          <button class="btn-primary" (click)="saveEvent()">
+            {{ isEditMode ? 'Mettre à jour' : 'Créer l\'événement' }}
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
+</div>

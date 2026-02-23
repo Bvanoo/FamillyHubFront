@@ -9,7 +9,7 @@ export class Navigation {
   _router = inject(Router);
   _location = inject(Location);
  
-  userName= signal("");
+  userName= signal("geg");
   user= signal("");
 
 
