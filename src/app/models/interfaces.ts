@@ -1,17 +1,17 @@
-export interface User {
-  id: number;
-  userName: string;
-  email: string;
-}
+// export interface User {
+//   id: number;
+//   userName: string;
+//   email: string;
+// }
 
-export interface Group {
-  id: number;
-  name: string;
-  description?: string;
-  iconUrl?: string;
-  isPublic: boolean;
-  ownerId: string;
-}
+// export interface Group {
+//   id: number;
+//   name: string;
+//   description?: string;
+//   iconUrl?: string;
+//   isPublic: boolean;
+//   ownerId: string;
+// }
 
 export interface CalendarEvent {
   id?: number;
@@ -28,10 +28,10 @@ export interface CalendarEvent {
   extendedProps?: any; 
 }
 
-export interface Expense {
-  id: number;
-  title: string;
-  amountTotal: number;
-  paidBy: number;
-  calendarEventId: number;
-}
+// export interface Expense {
+//   id: number;
+//   title: string;
+//   amountTotal: number;
+//   paidBy: number;
+//   calendarEventId: number;
+// }
