@@ -9,8 +9,7 @@ export class Navigation {
   _router = inject(Router);
   _location = inject(Location);
  
-  isVisible = signal(true);
-  userName= signal("");
+  userName= signal("geg");
   user= signal("");
   
   

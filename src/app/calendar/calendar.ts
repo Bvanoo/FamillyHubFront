@@ -1,8 +1,18 @@
-import { Component, inject, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  ChangeDetectorRef,
+  HostListener,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FullCalendarModule } from '@fullcalendar/angular';
-import { CalendarOptions, DateSelectArg, EventClickArg } from '@fullcalendar/core';
+import {
+  CalendarOptions,
+  DateSelectArg,
+  EventClickArg,
+} from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -16,7 +26,7 @@ import { CalendarEvent } from '../models/interfaces';
   standalone: true,
   imports: [CommonModule, FormsModule, FullCalendarModule],
   templateUrl: './calendar.html',
-  styleUrls: ['./calendar.css']
+  styleUrls: ['./calendar.css'],
 })
 export class Calendar implements OnInit {
   private _calendarService = inject(CalendarService);
@@ -120,6 +130,7 @@ saveEvent() {
       title: safeTitle,
       color: this.tempEvent.groupId ? '#3b82f6' : this.tempEvent.color 
     };
+    console.log('Payload envoyé au serveur:', payload);
 
     console.log("Envoi payload:", payload);
 

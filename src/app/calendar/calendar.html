@@ -73,6 +73,15 @@
             </label>
           </div>
         </div>
+        <div class="input-group">
+          <label>Plage horaire</label>
+          <div class="time-range-container">
+            <select class="custom-input time-select" [(ngModel)]="selectedStartTime"
+              (ngModelChange)="onStartTimeChange()">
+              <option *ngFor="let time of timeSlots" [value]="time">
+                {{ time }}
+              </option>
+            </select>
 
         <div class="color-picker-group">
           <label>Couleur</label>
@@ -92,6 +101,7 @@
              <input type="color" class="rect-color-input" [(ngModel)]="tempEvent.color" [disabled]="tempEvent.groupId !== null">
           </div>
         </div>
+      </div>
 
       </div>
 

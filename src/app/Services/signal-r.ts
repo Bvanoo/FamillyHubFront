@@ -2,8 +2,15 @@ import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 
 @Injectable({ providedIn: 'root' })
-export class SignalRService {
-  private hubConnection!: signalR.HubConnection;
+export class SignalrService {
+  public hubConnection!: signalR.HubConnection;
+  private readonly messageReceivedSubject = new BehaviorSubject<{senderId: number, content: string, createdAt: Date} | null>(null);
+  public messageReceived$ = this.messageReceivedSubject.asObservable();
+
+  public async startConnection(): Promise<void> {
+    if (this.hubConnection?.state === signalR.HubConnectionState.Connected) {
+      return;
+    }
 
   public startConnection() {
     this.hubConnection = new signalR.HubConnectionBuilder()
