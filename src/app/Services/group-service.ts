@@ -114,4 +114,29 @@ export class GroupService {
       {},
     );
   }
+  /**
+   * Recherche des utilisateurs par nom ou email qui ne sont pas encore dans le groupe.
+   */
+  searchUsersNotInGroup(groupId: number, query: string): Observable<any[]> {
+    return this._http.get<any[]>(`${this._apiUrl}/${groupId}/search-users?query=${query}`);
+  }
+
+  /**
+   * Envoie une invitation à un utilisateur pour rejoindre un groupe spécifique.
+   */
+  inviteUserToGroup(groupId: number, userId: number): Observable<any> {
+    return this._http.post(`${this._apiUrl}/${groupId}/invite/${userId}`, {});
+  }
+  /**
+   * Récupère les détails d'un groupe spécifique via son ID.
+   */
+  getGroupById(groupId: number): Observable<any> {
+    return this._http.get<any>(`${this._apiUrl}/${groupId}`);
+  }
+  /**
+   * Retire un membre spécifique d'un groupe.
+   */
+  removeMemberFromGroup(groupId: number, userId: number): Observable<any> {
+    return this._http.delete(`${this._apiUrl}/${groupId}/members/${userId}`);
+  }
 }

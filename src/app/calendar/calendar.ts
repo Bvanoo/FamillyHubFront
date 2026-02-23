@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, HostListener, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FullCalendarModule } from '@fullcalendar/angular';
@@ -9,6 +9,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import frLocale from '@fullcalendar/core/locales/fr';
 import { CalendarService } from '../Services/calendar-service';
 import { GroupService } from '../Services/group-service';
+import { AuthService } from '../Services/auth-service';
 import { CalendarEvent } from '../models/interfaces';
 
 @Component({
@@ -17,21 +18,21 @@ import { CalendarEvent } from '../models/interfaces';
   templateUrl: './calendar.html',
   styleUrls: ['./calendar.css'],
 })
-/**
- * Represents the main calendar view used to display, create, and manage user and group events.
- * Coordinates data loading, user interactions, and modal state for editing and viewing calendar entries.
- */
 export class Calendar implements OnInit {
+  @Input() groupId?: number;
+
   private readonly _calendarService = inject(CalendarService);
   private readonly _groupService = inject(GroupService);
+  private readonly _authService = inject(AuthService);
   private readonly _cdr = inject(ChangeDetectorRef);
 
   showModal = false;
   isEditMode = false;
-  userId = 1;
+  userId: number = 0;
   selectedEventId: number | null = null;
   myGroups: any[] = [];
-  tempEvent = {
+
+  tempEvent: any = {
     title: '',
     description: '',
     start: '',
@@ -41,7 +42,7 @@ export class Calendar implements OnInit {
     isPrivate: false,
     maskDetails: false,
     groupId: null,
-    userId: this.userId,
+    userId: 0,
   };
 
   calendarOptions: CalendarOptions = {
@@ -58,45 +59,104 @@ export class Calendar implements OnInit {
     },
     select: this.handleSelect.bind(this),
     eventClick: this.handleEventClick.bind(this),
+    eventContent: this.renderEventContent.bind(this),
     events: [],
   };
-  /**
-   * Initializes the calendar component when it is first displayed. Prepares the view with the
-   * current set of events and the groups associated with the user so interactions are meaningful.
-   */
+
   ngOnInit() {
+    const user = this._authService.getUser();
+    if (user) {
+      this.userId = user.id || user.Id;
+      this.tempEvent.userId = this.userId;
+    }
+
     this.loadUnifiedEvents();
-    this.loadMyGroups();
+
+    if (!this.groupId) {
+      this.loadMyGroups();
+    }
   }
-  /**
-   * Refreshes the calendar with the unified set of events from the backend. Keeps the visible
-   * calendar in sync with the latest user and group event data.
-   */
+
+  renderEventContent(arg: any) {
+    const props = arg.event.extendedProps;
+    const title = arg.event.title;
+    const pic = props.userPicture;
+    const name = props.userName || 'Utilisateur';
+
+    let imgHtml = pic
+      ? `<img src="${pic}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover; margin-right: 5px; flex-shrink: 0;" onerror="this.style.display='none'">`
+      : `<span style="margin-right: 5px; font-size: 14px;">👤</span>`;
+
+    return {
+      html: `<div title="${name} : ${title}" style="display: flex; align-items: center; overflow: hidden; padding: 2px;">
+               ${imgHtml}
+               <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.9em;">
+                 <b>${name}</b> : ${title}
+               </span>
+             </div>`
+    };
+  }
+
   loadUnifiedEvents() {
     this._calendarService.getUnifiedEvents().subscribe({
-      next: (events) => {
-        const mappedEvents = events.map((e: any) => ({}));
-        this.calendarOptions = {
-          ...this.calendarOptions,
-          events: mappedEvents,
-        };
+      next: (events: any[]) => {
+        const eventsToDisplay = this.groupId
+          ? events.filter((e: any) => (e.groupId || e.GroupId) === this.groupId || !(e.groupId || e.GroupId))
+          : events;
+
+        const mappedEvents = eventsToDisplay.map((e: any) => {
+          const isMyEvent = (e.userId || e.UserId) === this.userId;
+          const isPrivate = e.isPrivate || e.IsPrivateEvent || e.IsPrivate;
+
+          let bgColor = e.color || e.Color || '#3b82f6';
+
+          let displayTitle = (isPrivate && !isMyEvent) ? 'Indisponible' : (e.title || e.Title || 'Sans titre');
+
+          if (isMyEvent && isPrivate) {
+            displayTitle = `🔒 ${displayTitle}`;
+          }
+
+          let picUrl = e.userPicture || e.UserPicture;
+          if (picUrl && !picUrl.startsWith('http')) {
+            picUrl = `https://localhost:7075${picUrl}`;
+          }
+
+          return {
+            id: (e.id || e.Id)?.toString(),
+            title: displayTitle,
+            start: e.start || e.Start,
+            end: e.end || e.End,
+            backgroundColor: bgColor,
+            borderColor: bgColor,
+            extendedProps: {
+              realTitle: e.title || e.Title || 'Sans titre',
+              realDescription: e.description || e.Description || '',
+              description: (isPrivate && !isMyEvent) ? '' : (e.description || e.Description),
+              groupId: e.groupId || e.GroupId,
+              userId: e.userId || e.UserId,
+              userName: e.userName || e.UserName || 'Utilisateur',
+              userPicture: picUrl,
+              isPrivate: isPrivate,
+              maskDetails: e.maskDetails || e.MaskDetails,
+              type: e.type || e.Type
+            }
+          };
+        });
+
+        this.calendarOptions = { ...this.calendarOptions, events: mappedEvents };
         this._cdr.detectChanges();
       },
+      error: (err) => console.error('Erreur chargement événements:', err)
     });
   }
-  /**
-   * Retrieves the groups associated with the current user and stores them for use in the calendar.
-   * Ensures group-related options and filtering in the calendar reflect the user's actual memberships.
-   */
+
   loadMyGroups() {
-    this._groupService
-      .getMyGroups()
-      .subscribe((groups) => (this.myGroups = groups));
+    this._groupService.getMyGroups().subscribe({
+      next: (groups) => (this.myGroups = groups),
+      error: (err) => console.error('Erreur chargement groupes:', err)
+    });
   }
-  /**
-   * Handles the user selecting a time range on the calendar to create a new event. Prepares a
-   * fresh temporary event and opens the event editor for the chosen time slot.
-   */
+
   handleSelect(selectInfo: DateSelectArg) {
     this.isEditMode = false;
     this.resetTempEvent();
@@ -105,54 +165,53 @@ export class Calendar implements OnInit {
     this.openModal();
     selectInfo.view.calendar.unselect();
   }
-  /**
-   * Handles a user clicking on an existing event in the calendar to view or edit its details.
-   * Switches the component into edit mode and pre-fills the temporary event with the clicked event's data.
-   */
+
   handleEventClick(clickInfo: EventClickArg) {
-    this.isEditMode = true;
     const props = clickInfo.event.extendedProps;
+    const eventOwnerId = props['userId'];
+    const isPrivate = props['isPrivate'];
+
+    if (eventOwnerId !== this.userId && isPrivate) {
+      return;
+    }
+
+    this.isEditMode = true;
     this.selectedEventId = Number(clickInfo.event.id);
 
     this.tempEvent = {
-      userId: this.userId,
-      title: clickInfo.event.title,
-      description: props['description'] || '',
+      userId: eventOwnerId || this.userId,
+      title: props['realTitle'],
+      description: props['realDescription'],
       start: clickInfo.event.startStr,
       end: clickInfo.event.endStr,
       color: clickInfo.event.backgroundColor,
-      type: props['type'],
-      isPrivate: props['isPrivate'],
-      maskDetails: props['maskDetails'],
-      groupId: props['groupId'],
+      type: props['type'] || 'Disponible',
+      isPrivate: isPrivate || false,
+      maskDetails: props['maskDetails'] || false,
+      groupId: props['groupId'] || null,
     };
     this.openModal();
   }
-  /**
-   * Saves the current temporary event to the backend, either creating a new entry or updating an existing one.
-   * Validates the selected time range and then refreshes the calendar view and closes the modal once the save completes.
-   */
+
   saveEvent() {
     if (!this.tempEvent.start || !this.tempEvent.end) {
       alert('Veuillez sélectionner une plage horaire valide.');
       return;
     }
-    const safeTitle =
-      this.tempEvent.title || this.tempEvent.type || 'Sans titre';
+
+    const safeTitle = this.tempEvent.title || this.tempEvent.type || 'Sans titre';
 
     const payload: CalendarEvent = {
       ...this.tempEvent,
+      id: this.selectedEventId ?? undefined,
       userId: this.userId,
       title: safeTitle,
       color: this.tempEvent.groupId ? '#3b82f6' : this.tempEvent.color,
     };
 
-    console.log('Envoi payload:', payload);
-
-    const request =
-      this.isEditMode && this.selectedEventId
-        ? this._calendarService.updateEvent(this.selectedEventId, payload)
-        : this._calendarService.saveEvent(payload);
+    const request = this.isEditMode && this.selectedEventId
+      ? this._calendarService.updateEvent(this.selectedEventId, payload)
+      : this._calendarService.saveEvent(payload);
 
     request.subscribe({
       next: () => {
@@ -161,28 +220,22 @@ export class Calendar implements OnInit {
       },
       error: (err) => {
         console.error('Erreur lors de la sauvegarde', err);
-        if (err.error && err.error.errors) {
-          console.log('Détails validation:', err.error.errors);
-        }
       },
     });
   }
-  /**
-   * Deletes the currently selected event from the calendar. After removal, it refreshes the
-   * displayed events and closes the modal to reflect the updated calendar state.
-   */
+
   deleteEvent() {
     if (this.selectedEventId) {
-      this._calendarService.deleteEvent(this.selectedEventId).subscribe(() => {
-        this.loadUnifiedEvents();
-        this.closeModal();
+      this._calendarService.deleteEvent(this.selectedEventId).subscribe({
+        next: () => {
+          this.loadUnifiedEvents();
+          this.closeModal();
+        },
+        error: (err) => console.error('Erreur lors de la suppression', err)
       });
     }
   }
-  /**
-   * Deletes the currently selected event from the backend calendar data. After deletion, it
-   * refreshes the displayed events and closes the event modal to reflect the updated state.
-   */
+
   resetTempEvent() {
     this.tempEvent = {
       title: '',
@@ -193,37 +246,21 @@ export class Calendar implements OnInit {
       type: 'Disponible',
       isPrivate: false,
       maskDetails: false,
-      groupId: null,
+      groupId: this.groupId || null,
       userId: this.userId,
     };
   }
-  /**
-   * Opens the event modal so the user can create or edit a calendar entry. Ensures the view updates
-   * immediately to reflect the modal's visible state.
-   */
+
   openModal() {
     this.showModal = true;
     this._cdr.detectChanges();
   }
-  /**
-   * Closes the event modal when the user finishes or cancels editing. Triggers a view update so
-   * the hidden modal state is immediately reflected in the UI.
-   */
+
   closeModal() {
     this.showModal = false;
     this._cdr.detectChanges();
   }
-  /**
-   * Placeholder hook for triggering a global save of calendar data. Currently logs a message
-   * indicating that persistence is already handled by the per-event API operations.
-   */
-  saveToDatabase() {
-    console.log("Sauvegarde globale (déjà gérée par l'API unitaire ici)");
-  }
-  /**
-   * Handles the Escape key press at the document level to provide a quick way to dismiss the modal.
-   * When triggered, it closes any open event modal so the user can return to the calendar view.
-   */
+
   @HostListener('document:keydown.escape')
   onEsc() {
     this.closeModal();

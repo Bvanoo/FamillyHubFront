@@ -1,63 +1,146 @@
-<div class="group-details-container" *ngIf="groupId">
-  
-  <div class="header">
-    <button class="btn-back" (click)="_nav.goBack()">⬅ Retour</button>
-    <h2>Espace du Groupe #{{ groupId }}</h2>
-  </div>
+<div class="app-container" *ngIf="groupId">
+  <main class="content-area">
 
-  <div class="tabs">
-    <button (click)="activeTab.set('chat')" [class.active]="activeTab() === 'chat'">💬 Chat</button>
-    <button (click)="activeTab.set('calendar')" [class.active]="activeTab() === 'calendar'">📅 Calendrier</button>
-    <button (click)="activeTab.set('settings')" [class.active]="activeTab() === 'settings'">⚙️ Paramètres</button>
-  </div>
-
-  <div *ngIf="activeTab() === 'chat'" class="chat-section">
-    <div class="messages-container">
-      <div *ngFor="let msg of messages()" class="message" [class.my-message]="msg.senderName === currentUser.name">
-        <div class="msg-header">
-            <strong>{{ msg.senderName }}</strong> 
-            <small>{{ msg.timestamp | date:'shortTime' }}</small>
-        </div>
-        <p>{{ msg.content }}</p>
+    <header class="page-header">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <button class="btn-secondary" (click)="_nav.goBack()">⬅ Retour</button>
+        <h1>👥 {{ groupDetails?.name || groupDetails?.Name || 'Espace du Groupe #' + groupId }}</h1>
       </div>
-    </div>
-    <div class="chat-input">
-      <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" placeholder="Écrivez un message...">
-      <button (click)="sendMessage()">Envoyer</button>
-    </div>
-  </div>
 
-  <div *ngIf="activeTab() === 'calendar'" class="calendar-section">
-    <h3>Calendrier du groupe</h3>
-    <p>Le calendrier partagé sera affiché ici !</p>
-  </div>
+      <div class="header-actions">
+        <button class="btn-tab" (click)="activeTab.set('chat')" [class.active]="activeTab() === 'chat'">💬 Chat</button>
+        <button class="btn-tab" (click)="activeTab.set('calendar')" [class.active]="activeTab() === 'calendar'">📅
+          Calendrier</button>
+        <button class="btn-tab" (click)="activeTab.set('settings')" [class.active]="activeTab() === 'settings'">⚙️
+          Paramètres</button>
+        <button class="btn-primary" (click)="openInviteModal()">➕ Ajouter un membre</button>
+      </div>
+    </header>
 
-  <div *ngIf="activeTab() === 'settings'" class="settings-section" style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
-    
-    <h3>Membres du groupe</h3>
-    <ul style="list-style: none; padding: 0; margin-bottom: 30px;">
-      <li *ngFor="let member of members()" style="padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <strong>{{ member.name }}</strong> 
-          <span *ngIf="member.role === 'Admin'" style="background: #ffd700; color: #333; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; margin-left: 10px;">👑 Admin</span>
+    <section class="group-layout">
+
+      <div class="card chat-section" *ngIf="activeTab() === 'chat'">
+        <div class="messages-container">
+          <div *ngFor="let msg of messages()" class="message" [class.my-message]="msg.senderName === currentUser.name">
+            <div class="msg-header">
+              <strong>{{ msg.senderName }}</strong>
+              <small>{{ msg.timestamp | date:'shortTime' }}</small>
+            </div>
+            <p>{{ msg.content }}</p>
+          </div>
         </div>
-        
-        <button *ngIf="isAdmin() && member.userId !== currentUser.id" 
-                (click)="transferRole(member.userId, member.name)"
-                style="background: #117eba; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">
-          Nommer Admin
-        </button>
-      </li>
-    </ul>
 
-    <div *ngIf="isAdmin()" style="border: 1px solid #ff4d4f; border-radius: 8px; padding: 15px; background: #fff1f0;">
-      <h3 style="color: #c62828; margin-top: 0;">Zone de danger</h3>
-      <p style="font-size: 0.9rem; color: #555;">La suppression du groupe entraînera la perte de tous les messages et événements liés.</p>
-      <button (click)="deleteGroup()" style="background: #c62828; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">
-        🗑️ Supprimer le groupe
-      </button>
+        <div class="chat-input" style="display: flex; gap: 10px; margin-top: 20px;">
+          <input type="text" class="custom-input" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()"
+            placeholder="Écrivez un message...">
+          <button class="btn-primary" (click)="sendMessage()">Envoyer</button>
+        </div>
+      </div>
+
+      <div class="card calendar-container" *ngIf="activeTab() === 'calendar'">
+        <app-calendar [groupId]="groupId"></app-calendar>
+      </div>
+
+      <div class="card settings-section" *ngIf="activeTab() === 'settings'">
+
+        <h3 style="margin-top: 0;">Membres du groupe</h3>
+
+        <ul style="list-style: none; padding: 0; margin-bottom: 30px;">
+          <li *ngFor="let member of members()"
+            style="padding: 12px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+
+            <div>
+              <strong style="font-size: 1.05rem;">{{ member.name || member.Name }}</strong>
+              <span *ngIf="member.role === 'Admin'"
+                style="background: #fef08a; color: #854d0e; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 12px; margin-left: 10px;">👑
+                Admin</span>
+            </div>
+
+            <button (click)="transferRole(member.userId, member.name || member.Name)" class="btn-primary"
+              style="padding: 6px 12px; font-size: 0.85rem;">
+              Nommer Admin
+            </button>
+
+            <button (click)="removeMember(member.userId, member.name || member.Name)" class="btn-danger"
+              style="padding: 6px 12px; font-size: 0.85rem;">
+              Retirer
+            </button>
+
+          </li>
+        </ul>
+
+        <div *ngIf="isAdmin()"
+          style="border: 1px solid #fca5a5; border-radius: 12px; padding: 20px; background: #fef2f2;">
+          <h3 style="color: #dc2626; margin-top: 0;">Zone de danger</h3>
+          <p style="font-size: 0.95rem; color: #7f1d1d; margin-bottom: 15px;">
+            La suppression du groupe entraînera la perte de tous les messages et événements liés. Cette action est
+            irréversible.
+          </p>
+          <button (click)="deleteGroup()" class="btn-danger">
+            🗑️ Supprimer le groupe
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <div class="modal-overlay" *ngIf="showInviteModal()" (click)="closeInviteModal()">
+    <div class="card modal-box" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <h2>Ajouter un membre</h2>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="input-group">
+          <label>Nom, prénom ou email</label>
+          <div style="display: flex; gap: 10px;">
+            <input type="text" class="custom-input" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+              (keyup.enter)="searchUsers()" placeholder="Ex: Jean Dupont">
+            <button class="btn-primary" (click)="searchUsers()">Chercher</button>
+          </div>
+        </div>
+
+        <p *ngIf="isSearching()" style="color: #64748b; font-style: italic; text-align: center; margin: 0;">Recherche en
+          cours...</p>
+        <p *ngIf="!isSearching() && searchResults().length === 0 && searchQuery()"
+          style="color: #ef4444; text-align: center; margin: 0;">
+          Aucun utilisateur trouvé.
+        </p>
+
+        <div class="results-list" *ngIf="searchResults().length > 0">
+          <div *ngFor="let user of searchResults()" class="result-item">
+
+            <div class="user-info">
+              <img
+                [src]="user.profilePictureUrl || user.ProfilePictureUrl ? 'https://localhost:7075' + (user.profilePictureUrl || user.ProfilePictureUrl) : 'assets/default-avatar.png'"
+                alt="Avatar" class="user-avatar" onerror="this.style.display='none'">
+              <div class="user-text">
+                <span class="user-name">{{ user.name || user.Name }}</span>
+                <span class="user-email">{{ user.email || user.Email }}</span>
+              </div>
+            </div>
+
+            <button (click)="inviteUser(user)" class="btn-primary" style="padding: 6px 12px; font-size: 0.85rem;">
+              Ajouter
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <div></div>
+        <div class="right-actions">
+          <button class="btn-cancel" (click)="closeInviteModal()">Fermer</button>
+        </div>
+      </div>
+
     </div>
-
   </div>
-
 </div>

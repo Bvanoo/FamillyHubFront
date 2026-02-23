@@ -5,7 +5,7 @@
       <h1>📅 Planning & Dispos</h1>
       <div class="header-actions">
         <button class="btn-secondary">Exporter</button>
-        <button class="btn-primary" (click)="saveToDatabase()">Enregistrer tout</button>
+        <button class="btn-primary" (click)="saveEvent()">Enregistrer tout</button>
       </div>
     </header>
 
@@ -49,15 +49,6 @@
         <div class="input-group">
           <label>Titre de l'événement</label>
           <input type="text" class="custom-input" [(ngModel)]="tempEvent.title" placeholder="Ex: Repas de famille, Dentiste...">
-        </div>
-
-        <div class="input-group">
-          <label>Ajouter au calendrier de :</label>
-          <select class="custom-input" [(ngModel)]="tempEvent.groupId">
-            <option [ngValue]="null">👤 Mon Calendrier Personnel</option>
-            <option disabled>──────────────</option>
-            <option *ngFor="let g of myGroups" [ngValue]="g.id">👥 {{ g.name }}</option>
-          </select>
         </div>
 
         <div class="input-group" *ngIf="tempEvent.groupId === null">

@@ -6,10 +6,11 @@ import { GroupService } from '../Services/group-service';
 import { SignalRService } from '../Services/signal-r';
 import { AuthService } from '../Services/auth-service';
 import { Navigation } from '../Services/navigation';
+import { Calendar } from '../calendar/calendar';
 
 @Component({
   selector: 'app-group-details',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Calendar],
   templateUrl: './group-details.html',
   styleUrls: ['./group-details.css'],
 })
@@ -28,21 +29,36 @@ export class GroupDetails implements OnInit, OnDestroy {
   isAdmin = signal<boolean>(false);
   newMessage: string = '';
 
+  groupDetails: any = null;
+  showInviteModal = signal(false);
+  searchQuery = signal('');
+  searchResults = signal<any[]>([]);
+  isSearching = signal(false);
+
   /**
-   * Initializes the group details view when it is first loaded. Sets up the current user context,
-   * resolves the active group, and prepares chat and member data for interaction.
+   * Initialisation du composant : récupération de l'ID, du user, du chat et des membres.
    */
   ngOnInit() {
     this.currentUser = this._authService.getUser();
     this.groupId = Number(this._route.snapshot.paramMap.get('id'));
 
+    this.loadGroupInfo();
     this.initChat();
-    this.loadMembers();
+    this.loadMembers(); 
   }
 
   /**
-   * Sets up the real-time chat channel for the current group so members can see history and new messages.
-   * Loads past messages, joins the SignalR group, and wires live updates into the local message list.
+   * Récupère les infos de base du groupe (Nom, description, etc.)
+   */
+  loadGroupInfo() {
+    this._groupService.getGroupById(this.groupId).subscribe({
+      next: (data) => this.groupDetails = data,
+      error: (err) => console.error('Erreur lors du chargement du groupe', err)
+    });
+  }
+
+  /**
+   * Connexion au Chat via SignalR.
    */
   initChat() {
     this._signalRService.startConnection();
@@ -63,34 +79,52 @@ export class GroupDetails implements OnInit, OnDestroy {
     );
   }
 
-  /**
-   * Loads the list of members for the current group and updates the local member state. Also determines
-   * whether the current user has admin rights in the group based on their membership role.
-   */
-  loadMembers() {
+loadMembers() {
     this._groupService.getGroupMembers(this.groupId).subscribe({
       next: (membres) => {
-        this.members.set(membres);
-        const myProfile = membres.find((m) => m.userId === this.currentUser.id);
+        this.members.set(membres); // Met à jour le signal instantanément
+        
+        // CORRECTION ICI : On utilise "==" au lieu de "===" pour éviter les bugs entre texte et nombre
+        const myProfile = membres.find((m) => m.userId == this.currentUser.id);
+        
         if (myProfile && myProfile.role === 'Admin') {
           this.isAdmin.set(true);
+        } else {
+          this.isAdmin.set(false); // S'assure de réinitialiser si on perd le rôle
         }
       },
       error: (err) => console.error('Erreur chargement membres:', err),
     });
   }
 
+  inviteUser(user: any) {
+    const targetUserId = user.id || user.Id;
+    this._groupService.inviteUserToGroup(this.groupId, targetUserId).subscribe({
+      next: () => {
+        alert(`${user.name || user.Name} a été ajouté(e) au groupe avec succès !`);
+        
+        // Retire l'utilisateur des résultats de recherche
+        this.searchResults.update(results => results.filter(u => (u.id || u.Id) !== targetUserId));
+        
+        // MISE À JOUR : On recharge la liste des membres pour le voir apparaître dans l'onglet Paramètres
+        this.loadMembers(); 
+      },
+      error: (err) => {
+        console.error("Erreur lors de l'ajout", err);
+        alert("Impossible d'ajouter l'utilisateur.");
+      }
+    });
+  }
+
   /**
-   * Cleans up the group details view when it is destroyed. Ensures the user leaves the SignalR
-   * group so no further real-time messages are received for this group.
+   * Déconnexion de SignalR lors de la destruction du composant.
    */
   ngOnDestroy() {
     this._signalRService.leaveGroup(this.groupId);
   }
 
   /**
-   * Sends a new chat message to the current group on behalf of the logged-in user. Ignores empty
-   * or whitespace-only messages and clears the input once the message is dispatched.
+   * Envoi d'un message dans le chat du groupe.
    */
   sendMessage() {
     if (!this.newMessage.trim()) return;
@@ -104,8 +138,7 @@ export class GroupDetails implements OnInit, OnDestroy {
   }
 
   /**
-   * Permanently deletes the current group after user confirmation. Notifies the user of the outcome
-   * and redirects back to the groups overview once the deletion succeeds.
+   * Suppression définitive du groupe (Action Admin).
    */
   deleteGroup() {
     if (
@@ -125,8 +158,7 @@ export class GroupDetails implements OnInit, OnDestroy {
   }
 
   /**
-   * Transfers the admin role of the current group to another member after explicit user confirmation.
-   * Updates local admin state, refreshes the members list, and returns the view to the chat tab once the transfer succeeds.
+   * Transfert des droits d'administration à un autre membre.
    */
   transferRole(newAdminId: number, memberName: string) {
     if (
@@ -143,6 +175,50 @@ export class GroupDetails implements OnInit, OnDestroy {
         },
         error: (err) =>
           alert(err.error?.message || 'Erreur lors du transfert.'),
+      });
+    }
+  }
+
+  openInviteModal() {
+    this.showInviteModal.set(true);
+    this.searchQuery.set('');
+    this.searchResults.set([]);
+    this.searchUsers();
+  }
+
+  closeInviteModal() {
+    this.showInviteModal.set(false);
+  }
+
+  searchUsers() {
+    this.isSearching.set(true);
+    const querySafe = this.searchQuery() ? this.searchQuery().trim() : '';
+    
+    this._groupService.searchUsersNotInGroup(this.groupId, querySafe).subscribe({
+      next: (users) => {
+        this.searchResults.set(users);
+        this.isSearching.set(false);
+      },
+      error: (err) => {
+        console.error('Erreur lors de la recherche', err);
+        this.isSearching.set(false);
+      }
+    });
+  }
+  /**
+   * Retire un membre du groupe (Action Admin).
+   */
+  removeMember(userId: number, memberName: string) {
+    if (confirm(`Êtes-vous sûr de vouloir retirer ${memberName} du groupe ?`)) {
+      this._groupService.removeMemberFromGroup(this.groupId, userId).subscribe({
+        next: () => {
+          alert(`${memberName} a été retiré(e) du groupe.`);
+          this.loadMembers();
+        },
+        error: (err) => {
+          console.error("Erreur lors du retrait du membre", err);
+          alert("Impossible de retirer ce membre.");
+        }
       });
     }
   }
