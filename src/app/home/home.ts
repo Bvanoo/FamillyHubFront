@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CalendarService } from '../Services/calendar-service';
 import { AuthService } from '../Services/auth-service';
@@ -13,6 +13,7 @@ import { Navigation } from '../Services/navigation';
 export class Home implements OnInit {
   private readonly _calendarService = inject(CalendarService);
   private readonly _authService = inject(AuthService);
+  private _cdr = inject(ChangeDetectorRef);
   _nav = inject(Navigation);
 
   upcomingEvents: any[] = [];
@@ -79,6 +80,7 @@ export class Home implements OnInit {
         })
         .sort((a, b) => a.parsedStart.getTime() - b.parsedStart.getTime())
         .slice(0, 6);
+        this._cdr.detectChanges();
         
       console.log("✅ 2. Événements gardés pour l'affichage :", this.upcomingEvents);
     },
