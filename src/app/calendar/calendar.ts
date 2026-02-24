@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef, HostListener, Input } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, HostListener, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FullCalendarModule } from '@fullcalendar/angular';
@@ -19,7 +19,7 @@ import { CalendarEvent } from '../models/interfaces';
   styleUrls: ['./calendar.css'],
 })
 export class Calendar implements OnInit {
-  @Input() groupId?: number;
+  groupId = input<number>();
 
   private readonly _calendarService = inject(CalendarService);
   private readonly _groupService = inject(GroupService);
@@ -72,7 +72,7 @@ export class Calendar implements OnInit {
 
     this.loadUnifiedEvents();
 
-    if (!this.groupId) {
+    if (!this.groupId()) {
       this.loadMyGroups();
     }
   }
@@ -98,9 +98,9 @@ export class Calendar implements OnInit {
   }
 
 loadUnifiedEvents() {
-    // Choix de la requête selon si on est dans un groupe ou sur la bannière globale
-    const request$ = this.groupId 
-      ? this._calendarService.getGroupEvents(this.groupId) 
+  const currentGroupId = this.groupId();
+    const request$ = currentGroupId
+      ? this._calendarService.getGroupEvents(currentGroupId) 
       : this._calendarService.getUnifiedEvents();
 
     request$.subscribe({
@@ -112,7 +112,6 @@ loadUnifiedEvents() {
           let bgColor = e.color || e.Color || '#3b82f6';
           let displayTitle = e.title || e.Title || 'Sans titre';
 
-          // Ajout visuel d'un cadenas pour MES propres événements privés
           if (isMyEvent && isPrivate) {
             displayTitle = `🔒 ${displayTitle}`;
           }
@@ -247,7 +246,7 @@ loadUnifiedEvents() {
       type: 'Disponible',
       isPrivate: false,
       maskDetails: false,
-      groupId: this.groupId || null,
+      groupId: this.groupId() || null,
       userId: this.userId,
     };
   }

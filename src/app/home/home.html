@@ -1,42 +1,42 @@
-<div class="app">
-    <main class="content">
-        <header class="header">
-            <h1>Bonjour {{userName()}}</h1>
-            <button class="btn-primary">+ Ajouter</button>
-        </header>
-        <section class="dashboard-grid">
-            <div class="card">
-                <h2>Aujourd’hui</h2>
-                <ul>
-                    <li>Ecole – 8h30</li>
-                    <li>Médecin – 16h00</li>
-                    <li>Soirée jeux – 19h30</li>
-                </ul>
+<div class="home-container">
+  <h2>📅 Prochains événements à venir</h2>
+  
+  @if (upcomingEvents.length === 0) {
+    <p class="no-events">Aucun événement prévu pour le moment. Profitez de votre temps libre !</p>
+  } @else {
+    <div class="events-grid">
+      @for (event of upcomingEvents; track event.id) {
+        
+        <div class="event-card" 
+             [style.borderLeftColor]="event.color" 
+             (click)="goToCalendar(event.groupId)">
+          
+          <div class="card-header">
+            <div class="user-info">
+              <img [src]="event.userPicture || 'FamHubIcon.png'" 
+                   alt="Profil" 
+                   class="profile-pic" 
+                   onerror="this.src='FamHubIcon.png'">
+              <span class="user-name">{{ event.userName }}</span>
             </div>
-            <div class="card">
-                <h2>Calendrier</h2>
-                <p>Aperçu du mois</p>
-                <button class="btn-secondary">Voir le calendrier</button>
-            </div>
-            <div class="card">
-                <h2>Famille</h2>
-                <ul>
-                    <li>Emma – Danse</li>
-                    <li>Lucas – Devoirs</li>
-                    <li>Paul – Télétravail</li>
-                </ul>
-            </div>
-            <div class="card">
-                <h2>Tâches</h2>
-                <label><input type="checkbox"> Préparer les sacs</label>
-                <label><input type="checkbox"> Sortir le chien</label>
-                <label><input type="checkbox"> Lancer une machine</label>
-            </div>
-            <div class="card">
-                <h2>Notifications</h2>
-                <p>Nouveau message</p>
-                <p>Rappel demain</p>
-            </div>
-        </section>
-    </main>
+            
+            <span class="badge" [ngClass]="event.isGroupEvent ? 'group-badge' : 'perso-badge'">
+              {{ event.isGroupEvent ? 'Groupe' : 'Perso' }}
+            </span>
+          </div>
+
+          <div class="card-body">
+            <h3 class="event-title">{{ event.title }}</h3>
+            <p class="event-date">🕒 {{ event.parsedStart | date:'dd/MM/yyyy HH:mm' }}</p>
+            
+            @if (event.description) {
+              <p class="event-desc">{{ event.description }}</p>
+            }
+          </div>
+          
+        </div>
+
+      }
+    </div>
+  }
 </div>
