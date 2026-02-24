@@ -79,7 +79,7 @@ export class Home implements OnInit {
           };
         })
         .sort((a, b) => a.parsedStart.getTime() - b.parsedStart.getTime())
-        .slice(0, 6);
+        .slice(0, 12);
         this._cdr.detectChanges();
         
       console.log("✅ 2. Événements gardés pour l'affichage :", this.upcomingEvents);

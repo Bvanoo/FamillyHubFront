@@ -9,7 +9,8 @@ import { Observable } from 'rxjs';
  */
 export class GroupService {
   private readonly _http = inject(HttpClient);
-  private readonly _apiUrl = 'https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net/api/Group';
+  private readonly _apiUrl =
+    'https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net/api/Group';
 
   /**
    * Creates a new group with the provided metadata.
@@ -118,7 +119,9 @@ export class GroupService {
    * Recherche des utilisateurs par nom ou email qui ne sont pas encore dans le groupe.
    */
   searchUsersNotInGroup(groupId: number, query: string): Observable<any[]> {
-    return this._http.get<any[]>(`${this._apiUrl}/${groupId}/search-users?query=${query}`);
+    return this._http.get<any[]>(
+      `${this._apiUrl}/${groupId}/search-users?query=${query}`,
+    );
   }
 
   /**
@@ -138,5 +141,14 @@ export class GroupService {
    */
   removeMemberFromGroup(groupId: number, userId: number): Observable<any> {
     return this._http.delete(`${this._apiUrl}/${groupId}/members/${userId}`);
+  }
+  drawSecretSanta(groupId: number) {
+    return this._http.post(`${this._apiUrl}/${groupId}/secretsanta/draw`, {});
+  }
+
+  getMySecretSantaTarget(groupId: number) {
+    return this._http.get<any>(
+      `${this._apiUrl}/${groupId}/secretsanta/my-target`,
+    );
   }
 }

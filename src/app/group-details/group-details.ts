@@ -34,6 +34,7 @@ export class GroupDetails implements OnInit, OnDestroy {
   searchQuery = signal('');
   searchResults = signal<any[]>([]);
   isSearching = signal(false);
+  mySecretSantaTarget = signal<any>(null);
 
   /**
    * Initialisation du composant : récupération de l'ID, du user, du chat et des membres.
@@ -45,6 +46,7 @@ export class GroupDetails implements OnInit, OnDestroy {
     this.loadGroupInfo();
     this.initChat();
     this.loadMembers(); 
+    this.loadMySecretSantaTarget();
   }
 
   /**
@@ -215,4 +217,33 @@ loadMembers() {
       });
     }
   }
+  loadMySecretSantaTarget() {
+    this._groupService.getMySecretSantaTarget(this.groupId).subscribe({
+      next: (target) => {
+        this.mySecretSantaTarget.set(target); // sera null si pas de tirage
+      },
+      error: (err) => console.error("Erreur chargement cible Secret Santa", err)
+    });
+  }
+
+  triggerSecretSanta() {
+    if (this.members().length < 3) {
+      alert("Il faut au moins 3 membres dans le groupe pour lancer un tirage.");
+      return;
+    }
+
+    if (confirm("Lancer un nouveau tirage ? Cela effacera l'ancien s'il y en a un.")) {
+      this._groupService.drawSecretSanta(this.groupId).subscribe({
+        next: () => {
+          alert("Tirage effectué ! Découvrez votre cible.");
+          this.loadMySecretSantaTarget(); // On recharge pour afficher la cible
+        },
+        error: (err) => alert(err.error || "Erreur lors du tirage.")
+      });
+    }
+  }
+
+  // openPrivateChat(targetId: number) {
+  //   this._router.navigate(['/messenger'], { queryParams: { targetUserId: targetId } });
+  // }
 }

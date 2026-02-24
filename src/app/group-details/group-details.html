@@ -9,10 +9,9 @@
 
       <div class="header-actions">
         <button class="btn-tab" (click)="activeTab.set('chat')" [class.active]="activeTab() === 'chat'">Chat</button>
-        <button class="btn-tab" (click)="activeTab.set('calendar')" [class.active]="activeTab() === 'calendar'">
-          Calendrier</button>
-        <button class="btn-tab" (click)="activeTab.set('settings')" [class.active]="activeTab() === 'settings'">
-          Paramètres</button>
+        <button class="btn-tab" (click)="activeTab.set('randomizer')" [class.active]="activeTab() === 'randomizer'">🎁 Secret Santa</button>
+        <button class="btn-tab" (click)="activeTab.set('calendar')" [class.active]="activeTab() === 'calendar'">Calendrier</button>
+        <button class="btn-tab" (click)="activeTab.set('settings')" [class.active]="activeTab() === 'settings'">Paramètres</button>
         <button class="btn-primary" (click)="openInviteModal()">Ajouter un membre</button>
       </div>
     </header>
@@ -37,12 +36,63 @@
         </div>
       </div>
 
+      <div class="card randomizer-section" *ngIf="activeTab() === 'randomizer'">
+        <div class="secret-santa-wrapper" style="max-width: 600px; margin: 0 auto; padding: 20px;">
+          
+          <h2 style="text-align: center; color: #d97706; font-size: 2rem; margin-top: 0;">🎁 Secret Santa</h2>
+
+          <div class="target-reveal" *ngIf="mySecretSantaTarget()">
+            <h3 style="text-align: center; color: #334155;">🎉 Vous êtes le Secret Santa de :</h3>
+            
+            <div class="target-card" style="display: flex; align-items: center; justify-content: center; gap: 20px; margin: 30px 0; padding: 30px; background: #fffbeb; border-radius: 16px; border: 3px dashed #f59e0b; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+              
+              <img [src]="mySecretSantaTarget().targetPicture ? 'https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net' + mySecretSantaTarget().targetPicture : 'assets/default-avatar.png'"
+                   alt="Avatar Cible" 
+                   style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 4px solid #fcd34d;" 
+                   onerror="this.src='FamHubIcon.png'">
+              
+              <span class="target-name" style="font-size: 2rem; font-weight: 800; color: #92400e; background: yellow; padding: 0 10px; border-radius: 8px;">
+                {{ mySecretSantaTarget().targetName }}
+              </span>
+            </div>
+            
+            <p style="text-align: center; color: #b45309; font-style: italic; font-size: 1.1rem;">Chut ! C'est un secret. Ne le dites à personne ! 🤫</p>
+            
+            <div style="text-align: center; margin-top: 30px;">
+              <!-- <button class="btn-primary" (click)="openPrivateChat(mySecretSantaTarget().targetId)" style="background-color: #4f46e5; font-size: 1.1rem; padding: 12px 24px;"> -->
+                <!-- 💬 Discuter discrètement avec ma cible -->
+              <!-- </button> -->
+            </div>
+          </div>
+
+          <div class="no-draw" *ngIf="!mySecretSantaTarget()" style="text-align: center; padding: 50px 20px;">
+            <div style="font-size: 4rem; margin-bottom: 20px;">🎲</div>
+            <p style="font-size: 1.2rem; color: #64748b; margin-bottom: 30px;">Aucun tirage n'a encore été effectué pour ce groupe.</p>
+            
+            <button *ngIf="isAdmin()" class="btn-primary" (click)="triggerSecretSanta()" style="background-color: #f59e0b; font-size: 1.2rem; padding: 15px 30px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);">
+              Lancer le tirage au sort !
+            </button>
+            
+            <p *ngIf="!isAdmin()" style="color: #94a3b8; font-style: italic; font-size: 1.1rem;">⏳ Attendez que l'administrateur lance le tirage.</p>
+          </div>
+
+          <div class="participants-list" style="margin-top: 50px; border-top: 1px solid #e2e8f0; padding-top: 30px;">
+            <h4 style="color: #475569; margin-top: 0; margin-bottom: 15px;">Participants au groupe ({{ members().length }})</h4>
+            <ul style="display: flex; flex-wrap: wrap; gap: 10px; padding: 0; list-style: none;">
+              <li *ngFor="let member of members()" style="background: #f1f5f9; padding: 10px 18px; border-radius: 20px; font-size: 0.95rem; font-weight: 500; color: #334155; border: 1px solid #e2e8f0;">
+                {{ member.name || member.Name }}
+              </li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
       <div class="card calendar-container" *ngIf="activeTab() === 'calendar'">
         <app-calendar [groupId]="groupId"></app-calendar>
       </div>
 
       <div class="card settings-section" *ngIf="activeTab() === 'settings'">
-
         <h3 style="margin-top: 0;">Membres du groupe</h3>
 
         <ul style="list-style: none; padding: 0; margin-bottom: 30px;">
@@ -52,17 +102,14 @@
             <div>
               <strong style="font-size: 1.05rem;">{{ member.name || member.Name }}</strong>
               <span *ngIf="member.role === 'Admin'"
-                style="background: #fef08a; color: #854d0e; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 12px; margin-left: 10px;">👑
-                Admin</span>
+                style="background: #fef08a; color: #854d0e; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 12px; margin-left: 10px;">👑 Admin</span>
             </div>
 
-            <div class="btn-gap">
-
+            <div class="btn-gap" *ngIf="isAdmin() && member.role !== 'Admin'">
               <button (click)="transferRole(member.userId, member.name || member.Name)" class="btn-primary"
                 style="padding: 6px 12px; font-size: 0.85rem;">
                 Nommer Admin
               </button>
-
               <button (click)="removeMember(member.userId, member.name || member.Name)" class="btn-danger"
                 style="padding: 6px 12px; font-size: 0.85rem;">
                 Retirer
@@ -83,11 +130,9 @@
             Supprimer le groupe
           </button>
         </div>
-
       </div>
 
     </section>
-
   </main>
 
   <div class="modal-overlay" *ngIf="showInviteModal()" (click)="closeInviteModal()">
@@ -98,7 +143,6 @@
       </div>
 
       <div class="modal-body">
-
         <div class="input-group">
           <label>Nom, prénom ou email</label>
           <div style="display: flex; gap: 10px;">
@@ -108,8 +152,7 @@
           </div>
         </div>
 
-        <p *ngIf="isSearching()" style="color: #64748b; font-style: italic; text-align: center; margin: 0;">Recherche en
-          cours...</p>
+        <p *ngIf="isSearching()" style="color: #64748b; font-style: italic; text-align: center; margin: 0;">Recherche en cours...</p>
         <p *ngIf="!isSearching() && searchResults().length === 0 && searchQuery()"
           style="color: #ef4444; text-align: center; margin: 0;">
           Aucun utilisateur trouvé.
@@ -117,24 +160,20 @@
 
         <div class="results-list" *ngIf="searchResults().length > 0">
           <div *ngFor="let user of searchResults()" class="result-item">
-
             <div class="user-info">
               <img
-                [src]="user.profilePictureUrl || user.ProfilePictureUrl ? 'https://localhost:7075' + (user.profilePictureUrl || user.ProfilePictureUrl) : 'assets/default-avatar.png'"
+                [src]="user.profilePictureUrl || user.ProfilePictureUrl ? 'https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net' + (user.profilePictureUrl || user.ProfilePictureUrl) : 'assets/default-avatar.png'"
                 alt="Avatar" class="user-avatar" onerror="this.style.display='none'">
               <div class="user-text">
                 <span class="user-name">{{ user.name || user.Name }}</span>
                 <span class="user-email">{{ user.email || user.Email }}</span>
               </div>
             </div>
-
             <button (click)="inviteUser(user)" class="btn-primary" style="padding: 6px 12px; font-size: 0.85rem;">
               Ajouter
             </button>
-
           </div>
         </div>
-
       </div>
 
       <div class="modal-footer">
