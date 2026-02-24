@@ -57,40 +57,37 @@ export class GroupDetails implements OnInit, OnDestroy {
     });
   }
 
-  /**
+/**
    * Connexion au Chat via SignalR.
    */
   initChat() {
-    this._signalRService.startConnection();
-    this._signalRService.joinGroup(this.groupId);
-
+    this._signalRService.startConnection().then(() => {
+      this._signalRService.joinGroup(this.groupId);
+      this._signalRService.addMessageListener(
+        (senderName, content, timestamp) => {
+          this.messages.update((prev) => [
+            ...prev,
+            { senderName, content, timestamp },
+          ]);
+        },
+      );
+    }).catch(err => console.error("Impossible de se connecter au chat", err));
     this._groupService.getGroupMessages(this.groupId).subscribe({
       next: (history) => this.messages.set(history),
       error: (err) => console.error('Erreur historique:', err),
     });
-
-    this._signalRService.addMessageListener(
-      (senderName, content, timestamp) => {
-        this.messages.update((prev) => [
-          ...prev,
-          { senderName, content, timestamp },
-        ]);
-      },
-    );
   }
 
 loadMembers() {
     this._groupService.getGroupMembers(this.groupId).subscribe({
       next: (membres) => {
-        this.members.set(membres); // Met à jour le signal instantanément
-        
-        // CORRECTION ICI : On utilise "==" au lieu de "===" pour éviter les bugs entre texte et nombre
+        this.members.set(membres);
         const myProfile = membres.find((m) => m.userId == this.currentUser.id);
         
         if (myProfile && myProfile.role === 'Admin') {
           this.isAdmin.set(true);
         } else {
-          this.isAdmin.set(false); // S'assure de réinitialiser si on perd le rôle
+          this.isAdmin.set(false);
         }
       },
       error: (err) => console.error('Erreur chargement membres:', err),
@@ -102,11 +99,7 @@ loadMembers() {
     this._groupService.inviteUserToGroup(this.groupId, targetUserId).subscribe({
       next: () => {
         alert(`${user.name || user.Name} a été ajouté(e) au groupe avec succès !`);
-        
-        // Retire l'utilisateur des résultats de recherche
         this.searchResults.update(results => results.filter(u => (u.id || u.Id) !== targetUserId));
-        
-        // MISE À JOUR : On recharge la liste des membres pour le voir apparaître dans l'onglet Paramètres
         this.loadMembers(); 
       },
       error: (err) => {

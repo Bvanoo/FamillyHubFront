@@ -56,15 +56,18 @@
                 Admin</span>
             </div>
 
-            <button (click)="transferRole(member.userId, member.name || member.Name)" class="btn-primary"
-              style="padding: 6px 12px; font-size: 0.85rem;">
-              Nommer Admin
-            </button>
+            <div class="btn-gap">
 
-            <button (click)="removeMember(member.userId, member.name || member.Name)" class="btn-danger"
-              style="padding: 6px 12px; font-size: 0.85rem;">
-              Retirer
-            </button>
+              <button (click)="transferRole(member.userId, member.name || member.Name)" class="btn-primary"
+                style="padding: 6px 12px; font-size: 0.85rem;">
+                Nommer Admin
+              </button>
+
+              <button (click)="removeMember(member.userId, member.name || member.Name)" class="btn-danger"
+                style="padding: 6px 12px; font-size: 0.85rem;">
+                Retirer
+              </button>
+            </div>
 
           </li>
         </ul>

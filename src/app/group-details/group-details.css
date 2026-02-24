@@ -12,6 +12,12 @@
     flex-direction: column;
 }
 
+.btn-gap{
+    display: flex;
+    width: 20%;
+    justify-content: space-around;
+}
+
 .content-area {
     padding: 30px;
     max-width: 1600px;

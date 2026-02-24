@@ -13,15 +13,13 @@ export class SignalRService {
    * Initializes and starts the SignalR hub connection to the chat endpoint.
    * Logs a message to the console indicating whether the connection attempt succeeded or failed.
    */
-  public startConnection() {
+  public startConnection(): Promise<void> {
     this._hubConnection = new signalR.HubConnectionBuilder()
       .withUrl('https://localhost:7075/chatHub')
       .build();
 
-    this._hubConnection
+    return this._hubConnection
       .start()
-      .then(() => console.log('✅ Connecté au ChatHub SignalR'))
-      .catch((err) => console.log('❌ Erreur SignalR : ' + err));
   }
 
   /**

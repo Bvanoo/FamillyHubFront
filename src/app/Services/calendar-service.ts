@@ -92,4 +92,10 @@ export class CalendarService {
     return this._http.get(`${this._expenseUrl}/balance/${eventId}`);
   }
   
+  /**
+   * Fetches events for a specific group, including participants' personal blocked times.
+   */
+  getGroupEvents(groupId: number): Observable<CalendarEvent[]> {
+    return this._http.get<CalendarEvent[]>(`${this._apiUrl}/group/${groupId}`);
+  }
 }

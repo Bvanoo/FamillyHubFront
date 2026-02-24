@@ -97,21 +97,22 @@ export class Calendar implements OnInit {
     };
   }
 
-  loadUnifiedEvents() {
-    this._calendarService.getUnifiedEvents().subscribe({
-      next: (events: any[]) => {
-        const eventsToDisplay = this.groupId
-          ? events.filter((e: any) => (e.groupId || e.GroupId) === this.groupId || !(e.groupId || e.GroupId))
-          : events;
+loadUnifiedEvents() {
+    // Choix de la requête selon si on est dans un groupe ou sur la bannière globale
+    const request$ = this.groupId 
+      ? this._calendarService.getGroupEvents(this.groupId) 
+      : this._calendarService.getUnifiedEvents();
 
-        const mappedEvents = eventsToDisplay.map((e: any) => {
+    request$.subscribe({
+      next: (events: any[]) => {
+        const mappedEvents = events.map((e: any) => {
           const isMyEvent = (e.userId || e.UserId) === this.userId;
           const isPrivate = e.isPrivate || e.IsPrivateEvent || e.IsPrivate;
 
           let bgColor = e.color || e.Color || '#3b82f6';
+          let displayTitle = e.title || e.Title || 'Sans titre';
 
-          let displayTitle = (isPrivate && !isMyEvent) ? 'Indisponible' : (e.title || e.Title || 'Sans titre');
-
+          // Ajout visuel d'un cadenas pour MES propres événements privés
           if (isMyEvent && isPrivate) {
             displayTitle = `🔒 ${displayTitle}`;
           }
@@ -131,7 +132,7 @@ export class Calendar implements OnInit {
             extendedProps: {
               realTitle: e.title || e.Title || 'Sans titre',
               realDescription: e.description || e.Description || '',
-              description: (isPrivate && !isMyEvent) ? '' : (e.description || e.Description),
+              description: e.description || e.Description,
               groupId: e.groupId || e.GroupId,
               userId: e.userId || e.UserId,
               userName: e.userName || e.UserName || 'Utilisateur',
