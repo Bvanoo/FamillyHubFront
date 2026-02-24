@@ -13,8 +13,8 @@ import { CalendarEvent } from '../models/interfaces';
  */
 export class CalendarService {
   private readonly _http = inject(HttpClient);
-  private readonly _apiUrl = 'https://localhost:7075/api/calendar';
-  private readonly _expenseUrl = 'https://localhost:7075/api/expense';
+  private readonly _apiUrl = 'https://famillyhub.azurewebsites.net/api/calendar';
+  private readonly _expenseUrl = 'https://famillyhub.azurewebsites.net/api/expense';
 
   /**
    * Persists a new calendar event to the backend.

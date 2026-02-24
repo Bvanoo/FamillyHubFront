@@ -13,8 +13,8 @@ export class Navigation {
   _location = inject(Location);
 
   isVisible = signal(true);
-  userName = signal('aaa');
-  user = signal('aaa');
+  userName = signal('');
+  user = signal('');
 
   /**
    * Shows the global navigation element wherever it is bound to the isVisible signal.
