@@ -161,4 +161,7 @@ export class GroupService {
   resetSecretSanta(groupId: number) {
     return this._http.delete(`${this._apiUrl}/${groupId}/secretsanta/reset`);
   }
+  getRandomPublicGroups(): Observable<any[]> {
+    return this._http.get<any[]>(`${this._apiUrl}/public/random`);
+  }
 }

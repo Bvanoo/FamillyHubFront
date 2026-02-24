@@ -38,20 +38,34 @@
   <div *ngIf="activeTab() === 'search'" class="tab-content">
     <h2>Trouver un groupe</h2>
     <div class="search-bar">
-      <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="search()" placeholder="Nom du groupe (ex: Poker, Famille)...">
+      <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="search()" placeholder="Chercher dans vos groupes...">
       <button (click)="search()">🔍</button>
     </div>
     
-    <div class="list-results">
+    <div *ngIf="searchQuery" class="list-results">
       <div *ngFor="let group of searchResults()" class="result-item">
         <div>
           <strong>{{ group.name }}</strong>
           <div style="font-size: 0.8rem; color: #666">{{ group.description || 'Pas de description' }}</div>
         </div>
-        <button (click)="joinGroup(group)">Rejoindre</button>
       </div>
+      <p *ngIf="searchResults().length === 0" style="text-align: center; color: #999;">Aucun groupe trouvé avec ce nom.</p>
+    </div>
+
+    <div *ngIf="!searchQuery" class="random-groups-section" style="margin-top: 20px;">
+      <h3 style="color: #4b5563; font-size: 1.1rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">✨ Groupes publics à découvrir</h3>
       
-      <p *ngIf="searchResults().length === 0 && searchQuery" style="text-align: center; color: #999;">Aucun groupe trouvé.</p>
+      <div class="list-results">
+        <div *ngFor="let group of randomPublicGroups()" class="result-item" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 10px; background: #f9fafb;">
+          <div>
+            <strong style="font-size: 1.1rem; color: #1f2937;">{{ group.name }}</strong>
+            <div style="font-size: 0.85rem; color: #6b7280; margin-top: 5px;">{{ group.description || 'Pas de description' }}</div>
+          </div>
+          <button class="btn-primary" (click)="joinGroup(group)" style="padding: 8px 16px;">Rejoindre</button>
+        </div>
+        
+        <p *ngIf="randomPublicGroups().length === 0" style="text-align: center; color: #9ca3af; padding: 20px;">Aucun nouveau groupe public disponible pour le moment.</p>
+      </div>
     </div>
   </div>
 
@@ -77,7 +91,9 @@
           <strong>Groupe Public</strong> 
         </label>
       </div>
-      <button type="submit">Créer le groupe</button>
+      <button type="submit" [disabled]="isCreating()" [ngStyle]="{'opacity': isCreating() ? '0.6' : '1', 'cursor': isCreating() ? 'not-allowed' : 'pointer'}">
+        {{ isCreating() ? 'Création en cours...' : 'Créer le groupe' }}
+      </button>
     </form>
   </div>
 
