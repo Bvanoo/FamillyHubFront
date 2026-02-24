@@ -113,3 +113,56 @@ h2 {
   text-align: center;
   border: 1px dashed #d1d5db;
 }
+
+/* --- État vide (Aucun événement) --- */
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Prend environ 70% de la hauteur de l'écran pour être bien centré verticalement */
+  min-height: 70vh; 
+}
+
+.empty-content {
+  text-align: center;
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.1);
+  border: 1px dashed #d1d5db;
+  max-width: 400px;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.no-events {
+  color: #4b5563;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.btn-primary {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
+}
+
+.btn-primary:active {
+  transform: translateY(2px);
+}

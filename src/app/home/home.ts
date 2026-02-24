@@ -1,12 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { CalendarService } from '../Services/calendar-service';
 import { AuthService } from '../Services/auth-service';
+import { Navigation } from '../Services/navigation';
 
 @Component({
   selector: 'app-home',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './home.html',
   styleUrls: ['./home.css']
@@ -14,7 +13,7 @@ import { AuthService } from '../Services/auth-service';
 export class Home implements OnInit {
   private readonly _calendarService = inject(CalendarService);
   private readonly _authService = inject(AuthService);
-  private _router = inject(Router);
+  _nav = inject(Navigation);
 
   upcomingEvents: any[] = [];
   currentUserId: number = 0;
@@ -29,52 +28,69 @@ export class Home implements OnInit {
   }
 
   loadUpcomingEvents() {
-    this._calendarService.getUnifiedEvents().subscribe({
-      next: (events: any[]) => {
-        const now = new Date();
+  this._calendarService.getUnifiedEvents().subscribe({
+    next: (events: any[]) => {
+      console.log("📅 1. Événements bruts reçus :", events);
+
+      const now = new Date(); 
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      this.upcomingEvents = events
+        .filter(e => {
+          const rawDate = e.start || e.Start;
+          const eventDate = new Date(rawDate);
+          
+          const isFutureOrToday = eventDate >= startOfToday; 
+          
+          const eventUserId = e.userId || e.UserId;
+          const isPrivate = e.isPrivate || e.IsPrivateEvent || e.IsPrivate === true;
+          
+          const isSomeoneElsesPrivate = isPrivate && eventUserId !== this.currentUserId;
+
+          console.log(`🔍 Analyse de "${e.title || e.Title}" :`, {
+            dateBrute: rawDate,
+            dateJS: eventDate,
+            estDansLeFutur: isFutureOrToday,
+            monId: this.currentUserId,
+            createurId: eventUserId,
+            estPrive: isPrivate,
+            seraCache: isSomeoneElsesPrivate
+          });
+
+          return isFutureOrToday && !isSomeoneElsesPrivate;
+        })
+        .map(e => {
+          let picUrl = e.userPicture || e.UserPicture;
+          if (picUrl && !picUrl.startsWith('http')) {
+            picUrl = `https://localhost:7075${picUrl}`;
+          }
+
+          return {
+            ...e,
+            parsedStart: new Date(e.start || e.Start),
+            userPicture: picUrl,
+            userName: e.userName || e.UserName || 'Utilisateur',
+            title: e.title || e.Title || 'Sans titre',
+            description: e.description || e.Description,
+            isGroupEvent: !!(e.groupId || e.GroupId),
+            groupId: e.groupId || e.GroupId,
+            color: e.color || e.Color || '#3b82f6'
+          };
+        })
+        .sort((a, b) => a.parsedStart.getTime() - b.parsedStart.getTime())
+        .slice(0, 6);
         
-        this.upcomingEvents = events
-          .filter(e => {
-            const eventDate = new Date(e.start || e.Start);
-            const isFuture = eventDate > now;
-            
-            const eventUserId = e.userId || e.UserId;
-            const isPrivate = e.isPrivate || e.IsPrivateEvent;
-            
-            const isSomeoneElsesPrivate = isPrivate && eventUserId !== this.currentUserId;
-
-            return isFuture && !isSomeoneElsesPrivate;
-          })
-          .map(e => {
-            let picUrl = e.userPicture || e.UserPicture;
-            if (picUrl && !picUrl.startsWith('http')) {
-              picUrl = `https://localhost:7075${picUrl}`;
-            }
-
-            return {
-              ...e,
-              parsedStart: new Date(e.start || e.Start),
-              userPicture: picUrl,
-              userName: e.userName || e.UserName || 'Utilisateur',
-              title: e.title || e.Title || 'Sans titre',
-              description: e.description || e.Description,
-              isGroupEvent: !!(e.groupId || e.GroupId),
-              groupId: e.groupId || e.GroupId,
-              color: e.color || e.Color || '#3b82f6'
-            };
-          })
-          .sort((a, b) => a.parsedStart.getTime() - b.parsedStart.getTime())
-          .slice(0, 6);
-      },
-      error: err => console.error("Erreur chargement des événements:", err)
-    });
-  }
+      console.log("✅ 2. Événements gardés pour l'affichage :", this.upcomingEvents);
+    },
+    error: err => console.error("Erreur chargement des événements:", err)
+  });
+}
 
   goToCalendar(groupId: number | null | undefined) {
     if (groupId) {
-      this._router.navigate(['/group-details', groupId]); 
+      this._nav.goToGroupDetail(groupId); 
     } else {
-      this._router.navigate(['/calendar']);
+      this._nav.goToCalendar();
     }
   }
 }
