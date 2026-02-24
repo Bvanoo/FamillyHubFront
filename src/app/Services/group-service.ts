@@ -151,4 +151,14 @@ export class GroupService {
       `${this._apiUrl}/${groupId}/secretsanta/my-target`,
     );
   }
+  revealSecretSanta(groupId: number) {
+    return this._http.post<any>(
+      `${this._apiUrl}/${groupId}/secretsanta/reveal`,
+      {},
+    );
+  }
+
+  resetSecretSanta(groupId: number) {
+    return this._http.delete(`${this._apiUrl}/${groupId}/secretsanta/reset`);
+  }
 }

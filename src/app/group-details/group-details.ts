@@ -34,7 +34,7 @@ export class GroupDetails implements OnInit, OnDestroy {
   searchQuery = signal('');
   searchResults = signal<any[]>([]);
   isSearching = signal(false);
-  mySecretSantaTarget = signal<any>(null);
+  secretSantaState = signal<any>({ isDrawn: false, isRevealed: false });
 
   /**
    * Initialisation du composant : récupération de l'ID, du user, du chat et des membres.
@@ -45,7 +45,7 @@ export class GroupDetails implements OnInit, OnDestroy {
 
     this.loadGroupInfo();
     this.initChat();
-    this.loadMembers(); 
+    this.loadMembers();
     this.loadMySecretSantaTarget();
   }
 
@@ -54,38 +54,41 @@ export class GroupDetails implements OnInit, OnDestroy {
    */
   loadGroupInfo() {
     this._groupService.getGroupById(this.groupId).subscribe({
-      next: (data) => this.groupDetails = data,
-      error: (err) => console.error('Erreur lors du chargement du groupe', err)
+      next: (data) => (this.groupDetails = data),
+      error: (err) => console.error('Erreur lors du chargement du groupe', err),
     });
   }
 
-/**
+  /**
    * Connexion au Chat via SignalR.
    */
   initChat() {
-    this._signalRService.startConnection().then(() => {
-      this._signalRService.joinGroup(this.groupId);
-      this._signalRService.addMessageListener(
-        (senderName, content, timestamp) => {
-          this.messages.update((prev) => [
-            ...prev,
-            { senderName, content, timestamp },
-          ]);
-        },
-      );
-    }).catch(err => console.error("Impossible de se connecter au chat", err));
+    this._signalRService
+      .startConnection()
+      .then(() => {
+        this._signalRService.joinGroup(this.groupId);
+        this._signalRService.addMessageListener(
+          (senderName, content, timestamp) => {
+            this.messages.update((prev) => [
+              ...prev,
+              { senderName, content, timestamp },
+            ]);
+          },
+        );
+      })
+      .catch((err) => console.error('Impossible de se connecter au chat', err));
     this._groupService.getGroupMessages(this.groupId).subscribe({
       next: (history) => this.messages.set(history),
       error: (err) => console.error('Erreur historique:', err),
     });
   }
 
-loadMembers() {
+  loadMembers() {
     this._groupService.getGroupMembers(this.groupId).subscribe({
       next: (membres) => {
         this.members.set(membres);
         const myProfile = membres.find((m) => m.userId == this.currentUser.id);
-        
+
         if (myProfile && myProfile.role === 'Admin') {
           this.isAdmin.set(true);
         } else {
@@ -100,14 +103,18 @@ loadMembers() {
     const targetUserId = user.id || user.Id;
     this._groupService.inviteUserToGroup(this.groupId, targetUserId).subscribe({
       next: () => {
-        alert(`${user.name || user.Name} a été ajouté(e) au groupe avec succès !`);
-        this.searchResults.update(results => results.filter(u => (u.id || u.Id) !== targetUserId));
-        this.loadMembers(); 
+        alert(
+          `${user.name || user.Name} a été ajouté(e) au groupe avec succès !`,
+        );
+        this.searchResults.update((results) =>
+          results.filter((u) => (u.id || u.Id) !== targetUserId),
+        );
+        this.loadMembers();
       },
       error: (err) => {
         console.error("Erreur lors de l'ajout", err);
         alert("Impossible d'ajouter l'utilisateur.");
-      }
+      },
     });
   }
 
@@ -188,17 +195,19 @@ loadMembers() {
   searchUsers() {
     this.isSearching.set(true);
     const querySafe = this.searchQuery() ? this.searchQuery().trim() : '';
-    
-    this._groupService.searchUsersNotInGroup(this.groupId, querySafe).subscribe({
-      next: (users) => {
-        this.searchResults.set(users);
-        this.isSearching.set(false);
-      },
-      error: (err) => {
-        console.error('Erreur lors de la recherche', err);
-        this.isSearching.set(false);
-      }
-    });
+
+    this._groupService
+      .searchUsersNotInGroup(this.groupId, querySafe)
+      .subscribe({
+        next: (users) => {
+          this.searchResults.set(users);
+          this.isSearching.set(false);
+        },
+        error: (err) => {
+          console.error('Erreur lors de la recherche', err);
+          this.isSearching.set(false);
+        },
+      });
   }
   /**
    * Retire un membre du groupe (Action Admin).
@@ -211,34 +220,62 @@ loadMembers() {
           this.loadMembers();
         },
         error: (err) => {
-          console.error("Erreur lors du retrait du membre", err);
-          alert("Impossible de retirer ce membre.");
-        }
+          console.error('Erreur lors du retrait du membre', err);
+          alert('Impossible de retirer ce membre.');
+        },
       });
     }
   }
   loadMySecretSantaTarget() {
     this._groupService.getMySecretSantaTarget(this.groupId).subscribe({
-      next: (target) => {
-        this.mySecretSantaTarget.set(target); // sera null si pas de tirage
-      },
-      error: (err) => console.error("Erreur chargement cible Secret Santa", err)
+      next: (state) => this.secretSantaState.set(state),
+      error: (err) => console.error('Erreur chargement état Secret Santa', err),
     });
   }
 
   triggerSecretSanta() {
     if (this.members().length < 3) {
-      alert("Il faut au moins 3 membres dans le groupe pour lancer un tirage.");
+      alert('Il faut au moins 3 membres dans le groupe pour lancer un tirage.');
       return;
     }
-
-    if (confirm("Lancer un nouveau tirage ? Cela effacera l'ancien s'il y en a un.")) {
+    if (confirm('Lancer le tirage de cette année ?')) {
       this._groupService.drawSecretSanta(this.groupId).subscribe({
         next: () => {
-          alert("Tirage effectué ! Découvrez votre cible.");
-          this.loadMySecretSantaTarget(); // On recharge pour afficher la cible
+          alert(
+            'Tirage effectué ! Chaque membre peut maintenant découvrir sa cible.',
+          );
+          this.loadMySecretSantaTarget();
         },
-        error: (err) => alert(err.error || "Erreur lors du tirage.")
+        error: (err) => alert(err.error || 'Erreur lors du tirage.'),
+      });
+    }
+  }
+
+  revealTarget() {
+    this._groupService.revealSecretSanta(this.groupId).subscribe({
+      next: (targetInfo) => {
+        this.secretSantaState.set({
+          isDrawn: true,
+          isRevealed: true,
+          ...targetInfo,
+        });
+      },
+      error: (err) => alert('Impossible de révéler la cible pour le moment.'),
+    });
+  }
+
+  resetSecretSanta() {
+    if (
+      confirm(
+        'Voulez-vous vraiment annuler le tirage actuel ? Personne ne saura plus à qui offrir !',
+      )
+    ) {
+      this._groupService.resetSecretSanta(this.groupId).subscribe({
+        next: () => {
+          alert('Le tirage a été réinitialisé.');
+          this.loadMySecretSantaTarget();
+        },
+        error: (err) => alert('Erreur lors de la réinitialisation.'),
       });
     }
   }
