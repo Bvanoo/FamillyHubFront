@@ -15,11 +15,11 @@ import { SecretSanta } from './secret-santa/secret-santa';
 export const routes: Routes = [
     
     {path: "home", component: Home, 
-        // canActivate: [loginGuard]
+        canActivate: [loginGuard]
     },
     {path: "login", component: Login},
     {path: "calendar", component: Calendar,
-        //  canActivate: [loginGuard]
+         canActivate: [loginGuard]
         },
     {path: "signup", component: Signup},
     {path: "randomizer", component: Randomizer},
@@ -27,10 +27,10 @@ export const routes: Routes = [
     {path: "groupes", component: Groupes},
     // {path: "messenger", component: Messenger},
     { path: 'groupes', component: Groupes,
-        //  canActivate: [loginGuard] 
+         canActivate: [loginGuard] 
         },
     { path: 'groupe/:id', component: GroupDetails,
-        //  canActivate: [loginGuard] 
+         canActivate: [loginGuard] 
         },
     {path: "nouveaumdp", component: Nouveaumdp},
     {path: "**", redirectTo : 'home'},
