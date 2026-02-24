@@ -42,15 +42,20 @@
       <button (click)="search()">🔍</button>
     </div>
     
-    <div *ngIf="searchQuery" class="list-results">
-      <div *ngFor="let group of searchResults()" class="result-item">
-        <div>
-          <strong>{{ group.name }}</strong>
-          <div style="font-size: 0.8rem; color: #666">{{ group.description || 'Pas de description' }}</div>
-        </div>
-      </div>
-      <p *ngIf="searchResults().length === 0" style="text-align: center; color: #999;">Aucun groupe trouvé avec ce nom.</p>
+<div class="list-results">
+  <div *ngFor="let group of randomPublicGroups()" class="result-item">
+    
+    <div class="result-item-header">
+      {{ group.name }}
     </div>
+
+    <div class="result-item-body">
+      <p>{{ group.description || 'Pas de description' }}</p>
+      <button (click)="joinGroup(group)">Rejoindre</button>
+    </div>
+
+  </div>
+</div>
 
     <div *ngIf="!searchQuery" class="random-groups-section" style="margin-top: 20px;">
       <h3 style="color: #4b5563; font-size: 1.1rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">✨ Groupes publics à découvrir</h3>
