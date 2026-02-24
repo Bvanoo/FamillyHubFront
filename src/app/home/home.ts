@@ -14,7 +14,9 @@ export class Home implements OnInit{
   ngOnInit(){
     const user = this._auth.getUser();
     this.userName.set(user.name)
+    
   }
 
+  
 
 }

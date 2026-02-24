@@ -8,12 +8,12 @@
       </div>
 
       <div class="header-actions">
-        <button class="btn-tab" (click)="activeTab.set('chat')" [class.active]="activeTab() === 'chat'">💬 Chat</button>
-        <button class="btn-tab" (click)="activeTab.set('calendar')" [class.active]="activeTab() === 'calendar'">📅
+        <button class="btn-tab" (click)="activeTab.set('chat')" [class.active]="activeTab() === 'chat'">Chat</button>
+        <button class="btn-tab" (click)="activeTab.set('calendar')" [class.active]="activeTab() === 'calendar'">
           Calendrier</button>
-        <button class="btn-tab" (click)="activeTab.set('settings')" [class.active]="activeTab() === 'settings'">⚙️
+        <button class="btn-tab" (click)="activeTab.set('settings')" [class.active]="activeTab() === 'settings'">
           Paramètres</button>
-        <button class="btn-primary" (click)="openInviteModal()">➕ Ajouter un membre</button>
+        <button class="btn-primary" (click)="openInviteModal()">Ajouter un membre</button>
       </div>
     </header>
 
@@ -80,7 +80,7 @@
             irréversible.
           </p>
           <button (click)="deleteGroup()" class="btn-danger">
-            🗑️ Supprimer le groupe
+            Supprimer le groupe
           </button>
         </div>
 

@@ -2,7 +2,7 @@
   <main class="content-area">
     
     <header class="page-header">
-      <h1>📅 Planning & Dispos</h1>
+      <h1>Planning & Dispos</h1>
       <div class="header-actions">
         <button class="btn-secondary">Exporter</button>
         <button class="btn-primary" (click)="saveEvent()">Enregistrer tout</button>
@@ -56,11 +56,11 @@
           <div class="checkbox-row">
             <label class="checkbox-label" title="Visible uniquement par moi">
               <input type="checkbox" [(ngModel)]="tempEvent.isPrivate"> 
-              🔒 Privé
+            Privé
             </label>
             <label class="checkbox-label" title="Les autres verront 'Occupé'">
               <input type="checkbox" [(ngModel)]="tempEvent.maskDetails" [disabled]="tempEvent.isPrivate"> 
-              🙈 Masquer détails
+            Masquer détails
             </label>
           </div>
         </div>
@@ -76,7 +76,7 @@
           </div>
 
           <p *ngIf="tempEvent.groupId !== null" style="font-size:0.9rem; color:#64748b; margin-bottom:10px;">
-            ℹ️ Les événements de groupe utilisent la couleur du groupe.
+            Les événements de groupe utilisent la couleur du groupe.
           </p>
 
           <div class="custom-color-section">

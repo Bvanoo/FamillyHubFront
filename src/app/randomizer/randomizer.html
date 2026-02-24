@@ -2,7 +2,7 @@
   <main class="content">
 
     <header class="header">
-      <h1>🎲 Randomizer</h1>
+      <h1>Randomizer</h1>
       <button class="btn-primary">Historique</button>
     </header>
 
@@ -13,13 +13,13 @@
         
         <div class="mode-selector">
           <button class="mode-btn" [class.active]="mode() === 'cacahuete'" (click)="setMode('cacahuete')">
-            <span class="icon">🥜</span>
+            <span class="icon"></span>
             <strong>Cacahuète</strong>
             <small>Tirage croisé secret</small>
           </button>
           
           <button class="mode-btn" [class.active]="mode() === 'tache'" (click)="setMode('tache')">
-            <span class="icon">📋</span>
+            <span class="icon"></span>
             <strong>Tâche</strong>
             <small>Assigner un élu au hasard</small>
           </button>
@@ -35,7 +35,7 @@
             @if (drawResult()) {
               <p class="winner-text" [class.drawing]="isDrawing()">
                 {{ mode() === 'tache' ? 'L\'élu(e) est : ' : 'Simulation...' }} 
-                <strong>{{ drawResult() }}</strong> 🎉
+                <strong>{{ drawResult() }}</strong> 
               </p>
             } @else {
               <p>Sélectionnez un groupe et lancez le tirage</p>
@@ -50,7 +50,7 @@
 
       <div class="card groups-panel">
         <div class="panel-header">
-          <h2>📁 Sélection du groupe</h2>
+          <h2>Sélection du groupe</h2>
         </div>
 
         <div class="groups-selection-area">
