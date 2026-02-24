@@ -12,7 +12,7 @@ import { Observable } from 'rxjs';
  */
 export class AuthService {
   private readonly _http = inject(HttpClient);
-  private readonly _apiUrl = 'https://famillyhub.azurewebsites.net/api/Auth/';
+  private readonly _apiUrl = 'https://famillyhub.azurewebsites.net/api/Auth';
 
   /**
    * Authenticates a user with the provided credentials against the backend API.
