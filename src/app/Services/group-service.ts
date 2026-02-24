@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
  */
 export class GroupService {
   private readonly _http = inject(HttpClient);
-  private readonly _apiUrl = 'https://famillyhub.azurewebsites.net/api/Group';
+  private readonly _apiUrl = 'https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net/api/Group';
 
   /**
    * Creates a new group with the provided metadata.

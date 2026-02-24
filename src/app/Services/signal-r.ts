@@ -15,7 +15,7 @@ export class SignalRService {
    */
   public startConnection(): Promise<void> {
     this._hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://famillyhub.azurewebsites.net/chatHub')
+      .withUrl('https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net/chatHub')
       .build();
 
     return this._hubConnection

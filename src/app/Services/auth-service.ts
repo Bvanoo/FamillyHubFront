@@ -12,7 +12,7 @@ import { Observable } from 'rxjs';
  */
 export class AuthService {
   private readonly _http = inject(HttpClient);
-  private readonly _apiUrl = 'https://famillyhub.azurewebsites.net/api/Auth';
+  private readonly _apiUrl = 'https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net/api/Auth';
 
   /**
    * Authenticates a user with the provided credentials against the backend API.
@@ -116,7 +116,7 @@ export class AuthService {
     const user = JSON.parse(userStr);
 
     if (user.profilePictureUrl && !user.profilePictureUrl.startsWith('http')) {
-      user.fullPictureUrl = `https://famillyhub.azurewebsites.net/${user.profilePictureUrl}`;
+      user.fullPictureUrl = `https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net/${user.profilePictureUrl}`;
     } else {
       user.fullPictureUrl = null;
     }
