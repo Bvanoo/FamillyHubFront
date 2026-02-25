@@ -1,8 +1,19 @@
-import { Component, inject, OnInit, ChangeDetectorRef, HostListener, input } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  ChangeDetectorRef,
+  HostListener,
+  input,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FullCalendarModule } from '@fullcalendar/angular';
-import { CalendarOptions, DateSelectArg, EventClickArg } from '@fullcalendar/core';
+import {
+  CalendarOptions,
+  DateSelectArg,
+  EventClickArg,
+} from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -33,6 +44,7 @@ export class Calendar implements OnInit {
   userId: number = 0;
   selectedEventId: number | null = null;
   myGroups: any[] = [];
+  isAddingTask: boolean = false;
 
   newTaskTitle: string = '';
   newTaskAssignedUserIds: string[] = [];
@@ -284,7 +296,10 @@ export class Calendar implements OnInit {
   }
 
   addTask() {
-    if (!this.selectedEventId || !this.newTaskTitle.trim()) return;
+    if (!this.selectedEventId || !this.newTaskTitle.trim() || this.isAddingTask)
+      return;
+
+    this.isAddingTask = true;
 
     const dto = {
       title: this.newTaskTitle,
@@ -309,9 +324,28 @@ export class Calendar implements OnInit {
 
         this.newTaskTitle = '';
         this.newTaskAssignedUserIds = [];
+        this.isAddingTask = false;
         this.loadUnifiedEvents();
       },
-      error: (err) => console.error("Erreur lors de l'ajout de la tâche", err),
+      error: (err) => {
+        console.error("Erreur lors de l'ajout de la tâche", err);
+        this.isAddingTask = false;
+      },
+    });
+  }
+
+  deleteTask(taskId: number) {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) return;
+
+    this._calendarService.deleteTask(taskId).subscribe({
+      next: () => {
+        this.tempEvent.tasks = this.tempEvent.tasks.filter(
+          (t: any) => (t.id || t.Id) !== taskId,
+        );
+        this.loadUnifiedEvents();
+      },
+      error: (err) =>
+        console.error('Erreur lors de la suppression de la tâche', err),
     });
   }
 

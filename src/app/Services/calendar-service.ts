@@ -16,8 +16,8 @@ export class CalendarService {
   private readonly _http = inject(HttpClient);
   private readonly _nav = inject(Navigation);
   baseUrl = this._nav.baseUrlProd;
-  private readonly _apiUrl = this.baseUrl+'/api/calendar';
-  private readonly _expenseUrl = this.baseUrl+'/api/expense';
+  private readonly _apiUrl = this.baseUrl + '/api/calendar';
+  private readonly _expenseUrl = this.baseUrl + '/api/expense';
   /**
    * Persists a new calendar event to the backend.
    *
@@ -93,15 +93,19 @@ export class CalendarService {
   getBalance(eventId: number): Observable<any> {
     return this._http.get(`${this._expenseUrl}/balance/${eventId}`);
   }
-  
+
   /**
    * Fetches events for a specific group, including participants' personal blocked times.
    */
   getGroupEvents(groupId: number): Observable<CalendarEvent[]> {
     return this._http.get<CalendarEvent[]>(`${this._apiUrl}/group/${groupId}`);
   }
-  
+
   addTaskToEvent(eventId: number, taskData: any): Observable<any> {
     return this._http.post(`${this._apiUrl}/${eventId}/tasks`, taskData);
+  }
+  
+  deleteTask(taskId: number): Observable<any> {
+    return this._http.delete(`${this._apiUrl}/tasks/${taskId}`);
   }
 }
