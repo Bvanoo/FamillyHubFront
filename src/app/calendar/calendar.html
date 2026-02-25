@@ -112,29 +112,37 @@
           <div class="tasks-section">
             <h3><i class="fas fa-tasks"></i> Tâches à faire ({{ tempEvent.tasks?.length || 0 }})</h3>
 
-            <ul class="task-list">
-              @for (task of tempEvent.tasks; track task.id || task.Id) {
-              <li class="task-item">
-                <div class="task-info">
-                  <span class="task-title">{{ task.title || task.Title }}</span>
+           <ul class="task-list">
+                @for (task of tempEvent.tasks; track task.id || task.Id) {
+                  
+                  <li class="task-item" [class.completed]="task.isCompleted">
+                    
+                    <input type="checkbox" 
+                           class="task-checkbox" 
+                           [checked]="task.isCompleted" 
+                           (change)="toggleTaskStatus(task)">
 
-                  @if ((task.assignedUserNames?.length > 0) || (task.AssignedUserNames?.length > 0)) {
-                  <span class="task-assignees">
-                    <i class="fas fa-user-tag"></i> {{ (task.assignedUserNames || task.AssignedUserNames).join(', ') }}
-                  </span>
-                  }
-                </div>
+                    <div class="task-info">
+                      <span class="task-title">{{ task.title || task.Title }}</span>
+                      
+                      @if ((task.assignedUserNames?.length > 0) || (task.AssignedUserNames?.length > 0)) {
+                        <span class="task-assignees">
+                          <i class="fas fa-user-tag"></i> {{ (task.assignedUserNames || task.AssignedUserNames).join(', ') }}
+                        </span>
+                      }
+                    </div>
 
-                <button class="btn-icon-danger" (click)="deleteTask(task.id || task.Id)" title="Supprimer la tâche">
-                  <i class="fas fa-trash-alt"></i>
-                </button>
-              </li>
-              }
+                    <button class="btn-icon-danger" (click)="deleteTask(task.id || task.Id)" title="Supprimer">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
 
-              @if (tempEvent.tasks?.length === 0) {
-              <p class="no-tasks">Aucune tâche pour le moment.</p>
-              }
-            </ul>
+                  </li>
+                }
+                
+                @if (tempEvent.tasks?.length === 0) {
+                  <p class="no-tasks">Aucune tâche pour le moment.</p>
+                }
+              </ul>
 
             <div class="add-task-form card-light">
               <div class="input-group">

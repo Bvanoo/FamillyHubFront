@@ -349,6 +349,20 @@ export class Calendar implements OnInit {
     });
   }
 
+  toggleTaskStatus(task: any) {
+    const newStatus = !task.isCompleted;
+    task.isCompleted = newStatus;
+
+    this._calendarService.toggleTaskStatus(task.id || task.Id, newStatus).subscribe({
+      next: () => {
+        this.loadUnifiedEvents();
+      },
+      error: (err) => {
+        console.error("Erreur lors de la mise à jour de la tâche", err);
+        task.isCompleted = !newStatus;
+      }
+    });
+  }
   deleteEvent() {
     if (this.selectedEventId) {
       this._calendarService.deleteEvent(this.selectedEventId).subscribe({

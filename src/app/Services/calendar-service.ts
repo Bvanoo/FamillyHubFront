@@ -104,8 +104,15 @@ export class CalendarService {
   addTaskToEvent(eventId: number, taskData: any): Observable<any> {
     return this._http.post(`${this._apiUrl}/${eventId}/tasks`, taskData);
   }
-  
+
   deleteTask(taskId: number): Observable<any> {
     return this._http.delete(`${this._apiUrl}/tasks/${taskId}`);
+  }
+
+  toggleTaskStatus(taskId: number, isCompleted: boolean): Observable<any> {
+    return this._http.put(
+      `${this._apiUrl}/tasks/${taskId}/toggle`,
+      isCompleted,
+    );
   }
 }
