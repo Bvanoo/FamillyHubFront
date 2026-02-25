@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CalendarEvent } from '../models/interfaces';
+import { Navigation } from './navigation';
 
 @Injectable({
   providedIn: 'root',
@@ -13,9 +14,10 @@ import { CalendarEvent } from '../models/interfaces';
  */
 export class CalendarService {
   private readonly _http = inject(HttpClient);
-  private readonly _apiUrl = 'https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net/api/calendar';
-  private readonly _expenseUrl = 'https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net/api/expense';
-
+  private readonly _nav = inject(Navigation);
+  baseUrl = this._nav.baseUrlProd;
+  private readonly _apiUrl = this.baseUrl+'/api/calendar';
+  private readonly _expenseUrl = this.baseUrl+'/api/expense';
   /**
    * Persists a new calendar event to the backend.
    *

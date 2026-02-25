@@ -15,6 +15,8 @@ export class Navigation {
   isVisible = signal(true);
   userName = signal('');
   user = signal('');
+  baseUrlProd="https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net";
+  baseUrlDev="https://localhost:4200";
 
   /**
    * Shows the global navigation element wherever it is bound to the isVisible signal.

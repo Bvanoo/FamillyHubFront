@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
+import { Navigation } from './navigation';
 
 @Injectable({ providedIn: 'root' })
 /**
@@ -8,14 +9,16 @@ import * as signalR from '@microsoft/signalr';
  */
 export class SignalRService {
   private _hubConnection!: signalR.HubConnection;
+  private readonly _nav = inject(Navigation)
 
+  url = this._nav.baseUrlProd;
   /**
    * Initializes and starts the SignalR hub connection to the chat endpoint.
    * Logs a message to the console indicating whether the connection attempt succeeded or failed.
    */
   public startConnection(): Promise<void> {
     this._hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net/chatHub')
+      .withUrl(this.url+'/chatHub')
       .build();
 
     return this._hubConnection

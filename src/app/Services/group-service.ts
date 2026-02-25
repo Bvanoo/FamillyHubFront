@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Navigation } from './navigation';
 
 @Injectable({ providedIn: 'root' })
 /**
@@ -9,8 +10,12 @@ import { Observable } from 'rxjs';
  */
 export class GroupService {
   private readonly _http = inject(HttpClient);
-  private readonly _apiUrl =
-    'https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net/api/Group';
+  private readonly _nav = inject(Navigation);
+
+
+  baseUrl = this._nav.baseUrlProd;
+  _apiUrl =
+    this.baseUrl+'/api/Group';
 
   /**
    * Creates a new group with the provided metadata.

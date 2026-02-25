@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Navigation } from './navigation';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +13,9 @@ import { Observable } from 'rxjs';
  */
 export class AuthService {
   private readonly _http = inject(HttpClient);
-  private readonly _apiUrl = 'https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net/api/Auth';
+  private readonly _nav = inject(Navigation)
+  baseUrl = this._nav.baseUrlProd;
+  private readonly _apiUrl = this.baseUrl+'/api/Auth';
 
   /**
    * Authenticates a user with the provided credentials against the backend API.
@@ -116,7 +119,7 @@ export class AuthService {
     const user = JSON.parse(userStr);
 
     if (user.profilePictureUrl && !user.profilePictureUrl.startsWith('http')) {
-      user.fullPictureUrl = `https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net/${user.profilePictureUrl}`;
+      user.fullPictureUrl = `${this.baseUrl}/${user.profilePictureUrl}`;
     } else {
       user.fullPictureUrl = null;
     }
