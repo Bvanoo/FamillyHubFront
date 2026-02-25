@@ -48,8 +48,12 @@
 
         <div class="actions-row">
           <button class="btn-primary" (click)="saveChanges()" [disabled]="isSaving">
-            <i class="fas fa-save" *ngIf="!isSaving"></i>
-            <i class="fas fa-spinner fa-spin" *ngIf="isSaving"></i>
+            @if (!isSaving) {
+              <i class="fas fa-save"></i>
+            }
+            @if (isSaving) {
+              <i class="fas fa-spinner fa-spin"></i>
+            }
             {{ isSaving ? 'Sauvegarde en cours...' : 'Enregistrer les modifications' }}
           </button>
         </div>

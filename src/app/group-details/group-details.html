@@ -5,15 +5,15 @@
         <button class="btn-icon" (click)="_nav.goBack()" aria-label="Retour">
           <i class="fas fa-arrow-left"></i>
         </button>
-        <h1>👥 {{ groupDetails?.name || groupDetails?.Name || 'Groupe #' + groupId }}</h1>
+        <h1><i class="fas fa-users"></i> {{ groupDetails?.name || groupDetails?.Name || 'Groupe #' + groupId }}</h1>
       </div>
 
       <div class="header-actions">
         <div class="tabs-scroll">
-          <button class="btn-tab" (click)="activeTab.set('chat')" [class.active]="activeTab() === 'chat'">💬 Chat</button>
-          <button class="btn-tab" (click)="activeTab.set('randomizer')" [class.active]="activeTab() === 'randomizer'">🎁 Secret Santa</button>
-          <button class="btn-tab" (click)="activeTab.set('calendar')" [class.active]="activeTab() === 'calendar'">📅 Calendrier</button>
-          <button class="btn-tab" (click)="activeTab.set('settings')" [class.active]="activeTab() === 'settings'">⚙️ Paramètres</button>
+          <button class="btn-tab" (click)="activeTab.set('chat')" [class.active]="activeTab() === 'chat'"><i class="fas fa-comments"></i> Chat</button>
+          <button class="btn-tab" (click)="activeTab.set('randomizer')" [class.active]="activeTab() === 'randomizer'"><i class="fas fa-gift"></i> Secret Santa</button>
+          <button class="btn-tab" (click)="activeTab.set('calendar')" [class.active]="activeTab() === 'calendar'"><i class="fas fa-calendar-alt"></i> Calendrier</button>
+          <button class="btn-tab" (click)="activeTab.set('settings')" [class.active]="activeTab() === 'settings'"><i class="fas fa-cog"></i> Paramètres</button>
         </div>
         
         <button class="btn-primary" (click)="openInviteModal()">
@@ -49,11 +49,11 @@
       @if (activeTab() === 'randomizer') {
         <div class="card randomizer-section">
           <div class="secret-santa-wrapper">
-            <h2 class="santa-title">🎁 Secret Santa {{ currentUser?.year || '' }}</h2>
+            <h2 class="santa-title"><i class="fas fa-gift"></i> Secret Santa {{ currentUser?.year || '' }}</h2>
 
             @if (!secretSantaState().isDrawn) {
               <div class="no-draw">
-                <div class="santa-icon">🎲</div>
+                <div class="santa-icon"><i class="fas fa-dice"></i></div>
                 <p class="santa-desc">Aucun tirage n'a encore été effectué pour cette année.</p>
 
                 @if (isAdmin()) {
@@ -61,38 +61,38 @@
                     Lancer le tirage au sort !
                   </button>
                 } @else {
-                  <p class="santa-wait">⏳ Attendez que l'administrateur lance le tirage.</p>
+                  <p class="santa-wait"><i class="fas fa-hourglass-half"></i> Attendez que l'administrateur lance le tirage.</p>
                 }
               </div>
             }
 
             @if (secretSantaState().isDrawn && !secretSantaState().isRevealed) {
               <div class="hidden-target">
-                <div class="santa-icon animated-bounce">📦</div>
+                <div class="santa-icon animated-bounce"><i class="fas fa-box"></i></div>
                 <h3>Le tirage a eu lieu !</h3>
                 <p class="santa-desc">Votre cible vous attend sagement dans cette boîte virtuelle.</p>
                 <button class="btn-santa-reveal" (click)="revealTarget()">
-                  🎁 Révéler ma cible
+                  <i class="fas fa-gift"></i> Révéler ma cible
                 </button>
               </div>
             }
 
             @if (secretSantaState().isDrawn && secretSantaState().isRevealed) {
               <div class="target-reveal">
-                <h3>🎉 Vous êtes le Secret Santa de :</h3>
+                <h3><i class="fas fa-glass-cheers"></i> Vous êtes le Secret Santa de :</h3>
                 <div class="target-card">
                   <img [src]="secretSantaState().targetPicture ? 'https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net' + secretSantaState().targetPicture : 'assets/default-avatar.png'"
                     alt="Avatar Cible" class="target-avatar" onerror="this.src='FamHubIcon.png'">
                   <span class="target-name">{{ secretSantaState().targetName }}</span>
                 </div>
-                <p class="santa-secret-text">Chut ! C'est un secret. Ne le dites à personne ! 🤫</p>
+                <p class="santa-secret-text">Chut ! C'est un secret. Ne le dites à personne ! <i class="fas fa-user-secret"></i></p>
               </div>
             }
 
             @if (isAdmin() && secretSantaState().isDrawn) {
               <div class="santa-admin-zone">
                 <button class="btn-danger-outline" (click)="resetSecretSanta()">
-                  🔄 Réinitialiser le tirage
+                  <i class="fas fa-sync-alt"></i> Réinitialiser le tirage
                 </button>
                 <p class="admin-note">(Action Admin : annule le tirage pour tout le monde)</p>
               </div>
@@ -116,7 +116,7 @@
                 <div class="member-info">
                   <strong>{{ member.name || member.Name }}</strong>
                   @if (member.role === 'Admin') {
-                    <span class="badge-admin">👑 Admin</span>
+                    <span class="badge-admin"><i class="fas fa-crown"></i> Admin</span>
                   }
                 </div>
                 @if (isAdmin() && member.role !== 'Admin') {

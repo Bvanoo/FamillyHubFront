@@ -2,99 +2,119 @@
   
   <div class="tabs">
     <button (click)="activeTab.set('my-groups')" [class.active]="activeTab() === 'my-groups'">
-      <i class="fa fa-users"></i> <span>Mes Groupes</span>
+      <i class="fas fa-users"></i> <span>Mes Groupes</span>
     </button>
     <button (click)="activeTab.set('search')" [class.active]="activeTab() === 'search'">
-      <i class="fa fa-search"></i> <span>Rejoindre</span>
+      <i class="fas fa-search"></i> <span>Rejoindre</span>
     </button>
     <button (click)="activeTab.set('create')" [class.active]="activeTab() === 'create'">
-      <i class="fa fa-plus-circle"></i> <span>Créer</span>
+      <i class="fas fa-plus-circle"></i> <span>Créer</span>
     </button>
   </div>
 
-  <div *ngIf="activeTab() === 'my-groups'" class="tab-content">
-    <h2>Mes Communautés</h2>
-    
-    <div class="card-grid" *ngIf="myGroups().length > 0; else noGroup">
-      <div class="group-card" *ngFor="let group of myGroups()">
-        <div class="card-header">{{ group.name }}</div>
-        <div class="card-body">
-          <p class="group-desc">{{ group.description || 'Pas de description' }}</p>
-          <button class="btn-primary" (click)="_nav.goToGroupDetail(group.id)">Entrer dans le groupe</button>
-        </div>
-      </div>
-    </div>
-
-    <ng-template #noGroup>
-      <div class="empty-state">
-        <p>Vous n'avez pas encore de groupe.</p>
-        <button class="link-btn" (click)="activeTab.set('search')">
-          Rejoindre un groupe existant
-        </button>
-      </div>
-    </ng-template>
-  </div>
-
-  <div *ngIf="activeTab() === 'search'" class="tab-content">
-    <h2>Trouver un groupe</h2>
-    <div class="search-bar">
-      <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="search()" placeholder="Chercher dans vos groupes...">
-      <button class="search-btn" (click)="search()" aria-label="Rechercher"><i class="fas fa-search"></i></button>
-    </div>
-    
-    <div class="list-results" *ngIf="searchQuery">
-      <div *ngFor="let group of randomPublicGroups()" class="result-item">
-        <div class="result-item-header">{{ group.name }}</div>
-        <div class="result-item-body">
-          <p class="group-desc">{{ group.description || 'Pas de description' }}</p>
-          <button class="btn-success" (click)="joinGroup(group)">Rejoindre</button>
-        </div>
-      </div>
-    </div>
-
-    <div *ngIf="!searchQuery" class="random-groups-section">
-      <h3 class="section-title">✨ Groupes publics à découvrir</h3>
+  @if (activeTab() === 'my-groups') {
+    <div class="tab-content">
+      <h2>Mes Communautés</h2>
       
-      <div class="list-results">
-        <div *ngFor="let group of randomPublicGroups()" class="result-item">
-          <div class="result-item-header">{{ group.name }}</div>
-          <div class="result-item-body">
-            <p class="group-desc">{{ group.description || 'Pas de description' }}</p>
-            <button class="btn-success" (click)="joinGroup(group)">Rejoindre</button>
+      @if (myGroups().length > 0) {
+        <div class="card-grid">
+          @for (group of myGroups(); track group.id) {
+            <div class="group-card">
+              <div class="card-header">{{ group.name }}</div>
+              <div class="card-body">
+                <p class="group-desc">{{ group.description || 'Pas de description' }}</p>
+                <button class="btn-primary" (click)="_nav.goToGroupDetail(group.id)">Entrer dans le groupe</button>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <p>Vous n'avez pas encore de groupe.</p>
+          <button class="link-btn" (click)="activeTab.set('search')">
+            Rejoindre un groupe existant
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  @if (activeTab() === 'search') {
+    <div class="tab-content">
+      <h2>Trouver un groupe</h2>
+      <div class="search-bar">
+        <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="search()" placeholder="Chercher dans vos groupes...">
+        <button class="search-btn" (click)="search()" aria-label="Rechercher"><i class="fas fa-search"></i></button>
+      </div>
+      
+      @if (searchQuery) {
+        <div class="list-results">
+          @for (group of randomPublicGroups(); track group.id) {
+            <div class="result-item">
+              <div class="result-item-header">{{ group.name }}</div>
+              <div class="result-item-body">
+                <p class="group-desc">{{ group.description || 'Pas de description' }}</p>
+                <button class="btn-success" (click)="joinGroup(group)">Rejoindre</button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (!searchQuery) {
+        <div class="random-groups-section">
+          <h3 class="section-title"><i class="fas fa-star"></i> Groupes publics à découvrir</h3>
+          
+          <div class="list-results">
+            @for (group of randomPublicGroups(); track group.id) {
+              <div class="result-item">
+                <div class="result-item-header">{{ group.name }}</div>
+                <div class="result-item-body">
+                  <p class="group-desc">{{ group.description || 'Pas de description' }}</p>
+                  <button class="btn-success" (click)="joinGroup(group)">Rejoindre</button>
+                </div>
+              </div>
+            }
+            
+            @if (randomPublicGroups().length === 0) {
+              <p class="empty-text">Aucun nouveau groupe public disponible pour le moment.</p>
+            }
           </div>
         </div>
-        
-        <p *ngIf="randomPublicGroups().length === 0" class="empty-text">Aucun nouveau groupe public disponible pour le moment.</p>
-      </div>
+      }
     </div>
-  </div>
+  }
 
-  <div *ngIf="activeTab() === 'create'" class="tab-content">
-    <h2>Créer une nouvelle tribu</h2>
+  @if (activeTab() === 'create') {
+    <div class="tab-content">
+      <h2>Créer une nouvelle tribu</h2>
 
-    <div *ngIf="creationError()" class="alert-error">
-      ⚠️ {{ creationError() }}
+      @if (creationError()) {
+        <div class="alert-error">
+          <i class="fas fa-exclamation-triangle"></i> {{ creationError() }}
+        </div>
+      }
+
+      <form class="create-form" (ngSubmit)="createGroup()">
+        <div class="form-group">
+          <label>Nom du groupe</label>
+          <input class="custom-input" [(ngModel)]="newGroup.name" name="name" placeholder="Ex: Les Cousins, Club Rando..." required>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea class="custom-input" [(ngModel)]="newGroup.description" name="desc" placeholder="Quel est le but de ce groupe ?" rows="3"></textarea>
+        </div>
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="newGroup.isPublic" name="public"> 
+            <span>Groupe Public</span> 
+          </label>
+        </div>
+        <button class="btn-primary submit-btn" type="submit" [disabled]="isCreating()" [class.loading]="isCreating()">
+          {{ isCreating() ? 'Création en cours...' : 'Créer le groupe' }}
+        </button>
+      </form>
     </div>
-
-    <form class="create-form" (ngSubmit)="createGroup()">
-      <div class="form-group">
-        <label>Nom du groupe</label>
-        <input class="custom-input" [(ngModel)]="newGroup.name" name="name" placeholder="Ex: Les Cousins, Club Rando..." required>
-      </div>
-      <div class="form-group">
-        <label>Description</label>
-        <textarea class="custom-input" [(ngModel)]="newGroup.description" name="desc" placeholder="Quel est le but de ce groupe ?" rows="3"></textarea>
-      </div>
-      <div class="checkbox-group">
-        <label class="checkbox-label">
-          <input type="checkbox" [(ngModel)]="newGroup.isPublic" name="public"> 
-          <span>Groupe Public</span> 
-        </label>
-      </div>
-      <button class="btn-primary submit-btn" type="submit" [disabled]="isCreating()" [class.loading]="isCreating()">
-        {{ isCreating() ? 'Création en cours...' : 'Créer le groupe' }}
-      </button>
-    </form>
-  </div>
+  }
 
 </div>
