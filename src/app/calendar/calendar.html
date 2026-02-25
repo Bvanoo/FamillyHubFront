@@ -100,6 +100,59 @@
             <div class="custom-color-section">
                <input type="color" class="rect-color-input" [(ngModel)]="tempEvent.color" [disabled]="tempEvent.groupId !== null">
             </div>
+            <hr class="separator">
+
+          @if (isEditMode) {
+            <div class="tasks-section">
+              <h3><i class="fas fa-tasks"></i> Tâches à faire ({{ tempEvent.tasks?.length || 0 }})</h3>
+              
+              <ul class="task-list">
+                @for (task of tempEvent.tasks; track task.id || task.Id) {
+                  <li class="task-item">
+                    <div class="task-info">
+                      <span class="task-title">{{ task.title || task.Title }}</span>
+                      
+                      @if ((task.assignedUserNames?.length > 0) || (task.AssignedUserNames?.length > 0)) {
+                        <span class="task-assignees">
+                          <i class="fas fa-user-tag"></i> {{ (task.assignedUserNames || task.AssignedUserNames).join(', ') }}
+                        </span>
+                      }
+                    </div>
+                  </li>
+                }
+                
+                @if (tempEvent.tasks?.length === 0) {
+                  <p class="no-tasks">Aucune tâche pour le moment.</p>
+                }
+              </ul>
+
+              <div class="add-task-form card-light">
+                <div class="input-group">
+                  <input type="text" class="custom-input" [(ngModel)]="newTaskTitle" placeholder="Ex: Acheter le pain, Réserver la salle...">
+                </div>
+                
+                @if (tempEvent.groupId) {
+                  <div class="input-group">
+                    <label>Assigner à (optionnel)</label>
+                    <select multiple class="custom-input select-multiple" [(ngModel)]="newTaskAssignedUserIds">
+                      @for (member of groupMembers; track member.userId || member.UserId) {
+                        <option [value]="member.userId || member.UserId">{{ member.name || member.Name }}</option>
+                      }
+                    </select>
+                    <small class="help-text">Maintenez CTRL (ou CMD sur Mac) pour en sélectionner plusieurs</small>
+                  </div>
+                }
+                
+                <button class="btn-secondary" (click)="addTask()" [disabled]="!newTaskTitle.trim()">
+                  <i class="fas fa-plus"></i> Ajouter la tâche
+                </button>
+              </div>
+            </div>
+          } @else {
+            <div class="tasks-info-box">
+              <i class="fas fa-info-circle"></i> <span>Sauvegardez l'événement une première fois pour pouvoir y ajouter des tâches.</span>
+            </div>
+          }
           </div>
 
         </div>

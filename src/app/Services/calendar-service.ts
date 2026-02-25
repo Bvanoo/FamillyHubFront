@@ -100,4 +100,8 @@ export class CalendarService {
   getGroupEvents(groupId: number): Observable<CalendarEvent[]> {
     return this._http.get<CalendarEvent[]>(`${this._apiUrl}/group/${groupId}`);
   }
+  
+  addTaskToEvent(eventId: number, taskData: any): Observable<any> {
+    return this._http.post(`${this._apiUrl}/${eventId}/tasks`, taskData);
+  }
 }

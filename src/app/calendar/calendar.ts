@@ -26,13 +26,17 @@ export class Calendar implements OnInit {
   private readonly _groupService = inject(GroupService);
   private readonly _authService = inject(AuthService);
   private readonly _cdr = inject(ChangeDetectorRef);
-  private readonly _nav = inject(Navigation)
+  private readonly _nav = inject(Navigation);
 
   showModal = false;
   isEditMode = false;
   userId: number = 0;
   selectedEventId: number | null = null;
   myGroups: any[] = [];
+
+  newTaskTitle: string = '';
+  newTaskAssignedUserIds: string[] = [];
+  groupMembers: any[] = [];
 
   tempEvent: any = {
     title: '',
@@ -45,12 +49,13 @@ export class Calendar implements OnInit {
     maskDetails: false,
     groupId: null,
     userId: 0,
+    tasks: [],
   };
 
   calendarOptions: CalendarOptions = {
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
     locale: frLocale,
-    timeZone: 'local', // S'assure que le calendrier utilise le fuseau local (Belgique)
+    timeZone: 'local',
     slotDuration: '01:00:00',
     selectable: true,
     height: 'auto',
@@ -84,39 +89,40 @@ export class Calendar implements OnInit {
     const title = arg.event.title;
     const pic = props.userPicture;
     const name = props.userName || 'Utilisateur';
+    const isPrivate = props.isPrivate;
+    const isMyEvent = props.userId === this.userId;
 
     let imgHtml = pic
       ? `<img src="${pic}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover; margin-right: 5px; flex-shrink: 0;" onerror="this.style.display='none'">`
-      : `<span style="margin-right: 5px; font-size: 14px;">👤</span>`;
+      : `<span style="margin-right: 5px; font-size: 14px; color: #64748b;"><i class="fas fa-user"></i></span>`;
+
+    let lockIcon =
+      isMyEvent && isPrivate
+        ? `<i class="fas fa-lock" style="margin-right: 4px; font-size: 0.8em;"></i>`
+        : '';
 
     return {
       html: `<div title="${name} : ${title}" style="display: flex; align-items: center; overflow: hidden; padding: 2px;">
                ${imgHtml}
                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.9em;">
-                 <b>${name}</b> : ${title}
+                 ${lockIcon}<b>${name}</b> : ${title}
                </span>
-             </div>`
+             </div>`,
     };
   }
 
   loadUnifiedEvents() {
     const currentGroupId = this.groupId();
     const request$ = currentGroupId
-      ? this._calendarService.getGroupEvents(currentGroupId) 
+      ? this._calendarService.getGroupEvents(currentGroupId)
       : this._calendarService.getUnifiedEvents();
 
     request$.subscribe({
       next: (events: any[]) => {
         const mappedEvents = events.map((e: any) => {
-          const isMyEvent = (e.userId || e.UserId) === this.userId;
           const isPrivate = e.isPrivate || e.IsPrivateEvent || e.IsPrivate;
-
           let bgColor = e.color || e.Color || '#3b82f6';
           let displayTitle = e.title || e.Title || 'Sans titre';
-
-          if (isMyEvent && isPrivate) {
-            displayTitle = `🔒 ${displayTitle}`;
-          }
 
           let picUrl = e.userPicture;
           if (picUrl && !picUrl.startsWith('http')) {
@@ -140,26 +146,42 @@ export class Calendar implements OnInit {
               userPicture: picUrl,
               isPrivate: isPrivate,
               maskDetails: e.maskDetails || e.MaskDetails,
-              type: e.type || e.Type
-            }
+              type: e.type || e.Type,
+              tasks: e.tasks || e.Tasks || [],
+            },
           };
         });
 
-        this.calendarOptions = { ...this.calendarOptions, events: mappedEvents };
+        this.calendarOptions = {
+          ...this.calendarOptions,
+          events: mappedEvents,
+        };
         this._cdr.detectChanges();
       },
-      error: (err) => console.error('Erreur chargement événements:', err)
+      error: (err) => console.error('Erreur chargement événements:', err),
     });
   }
 
   loadMyGroups() {
     this._groupService.getMyGroups().subscribe({
       next: (groups) => (this.myGroups = groups),
-      error: (err) => console.error('Erreur chargement groupes:', err)
+      error: (err) => console.error('Erreur chargement groupes:', err),
     });
   }
 
-  private formatForInput(dateStr: string, isAllDay: boolean, isEnd: boolean = false): string {
+  fetchGroupMembers(groupId: number) {
+    this._groupService.getGroupMembers(groupId).subscribe({
+      next: (members) => (this.groupMembers = members),
+      error: (err) =>
+        console.error('Erreur chargement membres du groupe:', err),
+    });
+  }
+
+  private formatForInput(
+    dateStr: string,
+    isAllDay: boolean,
+    isEnd: boolean = false,
+  ): string {
     if (isAllDay || dateStr.length <= 10) {
       const datePart = dateStr.substring(0, 10);
       return isEnd ? `${datePart}T09:00` : `${datePart}T08:00`;
@@ -170,9 +192,16 @@ export class Calendar implements OnInit {
   handleSelect(selectInfo: DateSelectArg) {
     this.isEditMode = false;
     this.resetTempEvent();
-    this.tempEvent.start = this.formatForInput(selectInfo.startStr, selectInfo.allDay);
-    this.tempEvent.end = this.formatForInput(selectInfo.endStr, selectInfo.allDay, true);
-    
+    this.tempEvent.start = this.formatForInput(
+      selectInfo.startStr,
+      selectInfo.allDay,
+    );
+    this.tempEvent.end = this.formatForInput(
+      selectInfo.endStr,
+      selectInfo.allDay,
+      true,
+    );
+
     this.openModal();
     selectInfo.view.calendar.unselect();
   }
@@ -193,16 +222,29 @@ export class Calendar implements OnInit {
       userId: eventOwnerId || this.userId,
       title: props['realTitle'],
       description: props['realDescription'],
-      start: this.formatForInput(clickInfo.event.startStr, clickInfo.event.allDay),
-      end: clickInfo.event.endStr 
-        ? this.formatForInput(clickInfo.event.endStr, clickInfo.event.allDay, true) 
+      start: this.formatForInput(
+        clickInfo.event.startStr,
+        clickInfo.event.allDay,
+      ),
+      end: clickInfo.event.endStr
+        ? this.formatForInput(
+            clickInfo.event.endStr,
+            clickInfo.event.allDay,
+            true,
+          )
         : this.formatForInput(clickInfo.event.startStr, clickInfo.event.allDay),
       color: clickInfo.event.backgroundColor,
       type: props['type'] || 'Disponible',
       isPrivate: isPrivate || false,
       maskDetails: props['maskDetails'] || false,
       groupId: props['groupId'] || null,
+      tasks: props['tasks'] || [],
     };
+
+    if (this.tempEvent.groupId) {
+      this.fetchGroupMembers(this.tempEvent.groupId);
+    }
+
     this.openModal();
   }
 
@@ -212,7 +254,8 @@ export class Calendar implements OnInit {
       return;
     }
 
-    const safeTitle = this.tempEvent.title || this.tempEvent.type || 'Sans titre';
+    const safeTitle =
+      this.tempEvent.title || this.tempEvent.type || 'Sans titre';
 
     const payload: CalendarEvent = {
       ...this.tempEvent,
@@ -224,9 +267,10 @@ export class Calendar implements OnInit {
       color: this.tempEvent.groupId ? '#3b82f6' : this.tempEvent.color,
     };
 
-    const request = this.isEditMode && this.selectedEventId
-      ? this._calendarService.updateEvent(this.selectedEventId, payload)
-      : this._calendarService.saveEvent(payload);
+    const request =
+      this.isEditMode && this.selectedEventId
+        ? this._calendarService.updateEvent(this.selectedEventId, payload)
+        : this._calendarService.saveEvent(payload);
 
     request.subscribe({
       next: () => {
@@ -239,6 +283,38 @@ export class Calendar implements OnInit {
     });
   }
 
+  addTask() {
+    if (!this.selectedEventId || !this.newTaskTitle.trim()) return;
+
+    const dto = {
+      title: this.newTaskTitle,
+      assignedUserIds: this.newTaskAssignedUserIds.map((id) => id.toString()),
+    };
+
+    this._calendarService.addTaskToEvent(this.selectedEventId, dto).subscribe({
+      next: (res) => {
+        if (!this.tempEvent.tasks) this.tempEvent.tasks = [];
+        this.tempEvent.tasks.push({
+          id: res.taskId || res.Id,
+          title: dto.title,
+          isCompleted: false,
+          assignedUserNames: this.groupMembers
+            .filter((m) =>
+              dto.assignedUserIds.includes(
+                m.userId?.toString() || m.UserId?.toString(),
+              ),
+            )
+            .map((m) => m.name || m.Name),
+        });
+
+        this.newTaskTitle = '';
+        this.newTaskAssignedUserIds = [];
+        this.loadUnifiedEvents();
+      },
+      error: (err) => console.error("Erreur lors de l'ajout de la tâche", err),
+    });
+  }
+
   deleteEvent() {
     if (this.selectedEventId) {
       this._calendarService.deleteEvent(this.selectedEventId).subscribe({
@@ -246,7 +322,7 @@ export class Calendar implements OnInit {
           this.loadUnifiedEvents();
           this.closeModal();
         },
-        error: (err) => console.error('Erreur lors de la suppression', err)
+        error: (err) => console.error('Erreur lors de la suppression', err),
       });
     }
   }
@@ -263,7 +339,10 @@ export class Calendar implements OnInit {
       maskDetails: false,
       groupId: this.groupId() || null,
       userId: this.userId,
+      tasks: [],
     };
+    this.newTaskTitle = '';
+    this.newTaskAssignedUserIds = [];
   }
 
   openModal() {
