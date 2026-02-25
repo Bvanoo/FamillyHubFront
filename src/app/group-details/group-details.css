@@ -1,18 +1,22 @@
 :host {
     display: block;
     width: 100%;
+    height: 100%;
 }
 
 .group-details-wrapper {
     width: 100%;
-    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 100px);
 }
 
 .page-header {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    margin: 24px 0px;
+    margin-bottom: 20px;
+    flex-shrink: 0;
 }
 
 .header-title-row {
@@ -102,7 +106,8 @@
 .group-layout {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    flex: 1;
+    min-height: 0;
 }
 
 .card {
@@ -111,13 +116,15 @@
     padding: 20px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
     border: 1px solid #e2e8f0;
-}
-
-.chat-section {
     display: flex;
     flex-direction: column;
-    height: 60vh;
-    min-height: 400px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.calendar-container {
+    padding: 5px;
+    overflow-x: hidden;
 }
 
 .messages-container {
@@ -176,12 +183,14 @@
     display: flex;
     gap: 10px;
     margin-top: 15px;
+    flex-shrink: 0;
 }
 
 .secret-santa-wrapper {
     max-width: 600px;
     margin: 0 auto;
     padding: 10px;
+    width: 100%;
 }
 
 .santa-title {
@@ -345,6 +354,7 @@
 .member-actions {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .danger-zone {
@@ -556,8 +566,8 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(4px);
     display: flex;
@@ -578,14 +588,16 @@
     background: white;
     border-radius: 16px;
     animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    max-height: 100%;
+    max-height: 90vh;
     overflow: hidden;
+    margin: auto;
 }
 
 .modal-header {
     padding: 20px;
     border-bottom: 1px solid #f1f5f9;
     flex-shrink: 0;
+    background: white;
 }
 
 .modal-header h2 {
@@ -600,6 +612,7 @@
     flex-direction: column;
     gap: 20px;
     overflow-y: auto;
+    background: white;
 }
 
 .modal-footer {
@@ -611,8 +624,6 @@
     flex-wrap: wrap;
     gap: 10px;
     flex-shrink: 0;
-    border-bottom-left-radius: inherit;
-    border-bottom-right-radius: inherit;
 }
 
 .right-actions {
@@ -657,8 +668,8 @@
 }
 
 @media (min-width: 1024px) {
-    .chat-section {
-        height: 70vh;
+    .group-details-wrapper {
+        height: calc(100vh - 40px);
     }
 }
 
