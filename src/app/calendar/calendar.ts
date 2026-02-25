@@ -45,10 +45,19 @@ export class Calendar implements OnInit {
   selectedEventId: number | null = null;
   myGroups: any[] = [];
   isAddingTask: boolean = false;
-
   newTaskTitle: string = '';
   newTaskAssignedUserIds: string[] = [];
   groupMembers: any[] = [];
+  toastVisible = false;
+  toastMessage = '';
+  toastType: 'success' | 'error' | 'info' = 'info';
+
+  confirmModal = {
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  };
 
   tempEvent: any = {
     title: '',
@@ -260,11 +269,11 @@ export class Calendar implements OnInit {
     this.openModal();
   }
 
-  saveEvent() {
-    if (!this.tempEvent.start || !this.tempEvent.end) {
-      alert('Veuillez sélectionner une plage horaire valide.');
-      return;
-    }
+ saveEvent() {
+  if (!this.tempEvent.start || !this.tempEvent.end) {
+    this.showToast('Veuillez sélectionner une plage horaire valide.', 'error');
+    return;
+  }
 
     const safeTitle =
       this.tempEvent.title || this.tempEvent.type || 'Sans titre';
@@ -334,46 +343,69 @@ export class Calendar implements OnInit {
     });
   }
 
-  deleteTask(taskId: number) {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) return;
-
-    this._calendarService.deleteTask(taskId).subscribe({
-      next: () => {
-        this.tempEvent.tasks = this.tempEvent.tasks.filter(
-          (t: any) => (t.id || t.Id) !== taskId,
-        );
-        this.loadUnifiedEvents();
-      },
-      error: (err) =>
-        console.error('Erreur lors de la suppression de la tâche', err),
-    });
-  }
+deleteTask(taskId: number) {
+  this.openConfirm(
+    'Supprimer la tâche',
+    'Voulez-vous vraiment supprimer cette tâche ?',
+    () => {
+      this._calendarService.deleteTask(taskId).subscribe({
+        next: () => {
+          if (this.tempEvent.tasks) {
+            this.tempEvent.tasks = this.tempEvent.tasks.filter((t: any) => (t.id || t.Id) !== taskId);
+          }
+          this.showToast('Tâche supprimée avec succès.', 'success');
+          this.loadUnifiedEvents();
+          this.closeConfirm();
+        },
+        error: (err) => {
+          console.error("Erreur suppression", err);
+          this.showToast('Impossible de supprimer la tâche.', 'error');
+          this.closeConfirm();
+        }
+      });
+    }
+  );
+}
 
   toggleTaskStatus(task: any) {
     const newStatus = !task.isCompleted;
     task.isCompleted = newStatus;
 
-    this._calendarService.toggleTaskStatus(task.id || task.Id, newStatus).subscribe({
-      next: () => {
-        this.loadUnifiedEvents();
-      },
-      error: (err) => {
-        console.error("Erreur lors de la mise à jour de la tâche", err);
-        task.isCompleted = !newStatus;
-      }
-    });
-  }
-  deleteEvent() {
-    if (this.selectedEventId) {
-      this._calendarService.deleteEvent(this.selectedEventId).subscribe({
+    this._calendarService
+      .toggleTaskStatus(task.id || task.Id, newStatus)
+      .subscribe({
         next: () => {
           this.loadUnifiedEvents();
-          this.closeModal();
         },
-        error: (err) => console.error('Erreur lors de la suppression', err),
+        error: (err) => {
+          console.error('Erreur lors de la mise à jour de la tâche', err);
+          task.isCompleted = !newStatus;
+        },
       });
-    }
   }
+deleteEvent() {
+  if (this.selectedEventId) {
+    this.openConfirm(
+      'Supprimer l\'événement',
+      'Voulez-vous vraiment supprimer cet événement ? Cette action est irréversible.',
+      () => {
+        this._calendarService.deleteEvent(this.selectedEventId!).subscribe({
+          next: () => {
+            this.showToast('Événement supprimé.', 'success');
+            this.loadUnifiedEvents();
+            this.closeModal();
+            this.closeConfirm();
+          },
+          error: (err) => {
+            console.error(err);
+            this.showToast('Erreur lors de la suppression.', 'error');
+            this.closeConfirm();
+          }
+        });
+      }
+    );
+  }
+}
 
   resetTempEvent() {
     this.tempEvent = {
@@ -402,6 +434,21 @@ export class Calendar implements OnInit {
     this.showModal = false;
     this._cdr.detectChanges();
   }
+
+  showToast(message: string, type: 'success' | 'error' | 'info' = 'info') {
+  this.toastMessage = message;
+  this.toastType = type;
+  this.toastVisible = true;
+  setTimeout(() => this.toastVisible = false, 3000);
+}
+
+openConfirm(title: string, message: string, onConfirm: () => void) {
+  this.confirmModal = { isOpen: true, title, message, onConfirm };
+}
+
+closeConfirm() {
+  this.confirmModal.isOpen = false;
+}
 
   @HostListener('document:keydown.escape')
   onEsc() {
