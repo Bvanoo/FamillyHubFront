@@ -1,4 +1,11 @@
-<nav class="sidebar">
+<button class="burger-btn" (click)="toggleMenu()" aria-label="Menu">
+    <i class="fas fa-bars" *ngIf="!isMenuOpen()"></i>
+    <i class="fas fa-times" *ngIf="isMenuOpen()"></i>
+</button>
+
+<div class="sidebar-overlay" *ngIf="isMenuOpen()" (click)="closeMenu()"></div>
+
+<nav class="sidebar" [class.open]="isMenuOpen()">
     <div class="sidebar-header">
         <img src="FamHubIcon.png" alt="FamillyHub Logo" class="logo">
         <span class="brand-name">FamillyHub</span>
@@ -6,30 +13,24 @@
 
     <ul class="nav-links">
         <li [ngClass]="{ 'active': hasRoute('/home') }">
-            <a (click)="_nav.goToHome()"> <i class="fas fa-home"></i> <span>Accueil</span></a>
+            <a (click)="_nav.goToHome(); closeMenu()"> <i class="fas fa-home"></i> <span>Accueil</span></a>
         </li>
         <li [ngClass]="{ 'active': hasRoute('/calendar') }">
-            <a (click)="_nav.goToCalendar()"><i class="fas fa-calendar-alt"></i> <span>Calendrier</span></a>
+            <a (click)="_nav.goToCalendar(); closeMenu()"><i class="fas fa-calendar-alt"></i> <span>Calendrier</span></a>
         </li>
-        <!-- <li [ngClass]="{ 'active': hasRoute('/messages') }">
-            <a (click)="_nav.goToMessenger()"><i class="fas fa-comments"></i> <span>Messages</span></a>
-        </li> -->
         <li [ngClass]="{ 'active': hasRoute('/tricount') }">
-            <a (click)="_nav.goToGroupes()"><i class="fas fa-users"></i> <span>Groupes</span></a>
+            <a (click)="_nav.goToGroupes(); closeMenu()"><i class="fas fa-users"></i> <span>Groupes</span></a>
         </li>
-        <!-- <li [ngClass]="{ 'active': hasRoute('/random') }">
-            <a (click)="_nav.goToRandomizer()"><i class="fas fa-dice"></i> <span>Randomizer</span></a>
-        </li> -->
     </ul>
 
     <div class="sidebar-footer">
-    <div class="user-profile">
-        <img [src]="currentUser?.fullPictureUrl || 'https://ui-avatars.com/api/?name=' + (currentUser?.name || 'User')" 
-             (click)="_nav.goToProfil()" alt="Profil">
-        <div class="user-info">
-            <p class="name">{{ currentUser?.name }}</p>
-            <p class="status logout-link" (click)="handleLogout()">Déconnexion</p>
+        <div class="user-profile">
+            <img [src]="currentUser?.fullPictureUrl || 'https://ui-avatars.com/api/?name=' + (currentUser?.name || 'User')" 
+                 (click)="_nav.goToProfil(); closeMenu()" alt="Profil">
+            <div class="user-info">
+                <p class="name">{{ currentUser?.name }}</p>
+                <p class="status logout-link" (click)="handleLogout()">Déconnexion</p>
+            </div>
         </div>
     </div>
-</div>
 </nav>

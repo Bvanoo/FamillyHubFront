@@ -15,7 +15,7 @@ export class GroupService {
 
   baseUrl = this._nav.baseUrlProd;
   _apiUrl =
-    this.baseUrl+'/api/Group';
+    this._nav.baseUrlProd+'/api/Group';
 
   /**
    * Creates a new group with the provided metadata.

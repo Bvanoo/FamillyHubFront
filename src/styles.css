@@ -1,4 +1,4 @@
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -17,11 +17,22 @@
 }
 
 body {
-    background-color: var(--white);
+    background-color: var(--bg-light);
     font-family: 'Quicksand', sans-serif;
     color: var(--text-dark);
+    -webkit-font-smoothing: antialiased;
 }
 
-a{
+a {
     cursor: pointer;
+}
+
+.main-wrapper {
+    padding-top: 80px;
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+}
+
+app-banner.disable {
+    display: none;
 }
