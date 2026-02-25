@@ -4,10 +4,11 @@ import { Banner } from "./banner/banner";
 import { CommonModule } from '@angular/common';
 import { Navigation } from './Services/navigation';
 import { filter } from 'rxjs';
+import { Utils } from './utils/utils';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Banner, CommonModule],
+  imports: [RouterOutlet, Banner, CommonModule, Utils],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

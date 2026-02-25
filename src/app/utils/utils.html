@@ -1,0 +1,27 @@
+@if (utilsService.toastVisible()) {
+  <div class="toast-container" [ngClass]="utilsService.toastType()">
+    <div class="toast-content">
+      @if (utilsService.toastType() === 'success') { <i class="fas fa-check-circle"></i> }
+      @if (utilsService.toastType() === 'error') { <i class="fas fa-exclamation-triangle"></i> }
+      @if (utilsService.toastType() === 'info') { <i class="fas fa-info-circle"></i> }
+      <span>{{ utilsService.toastMessage() }}</span>
+    </div>
+  </div>
+}
+
+@if (utilsService.confirmIsOpen()) {
+  <div class="modal-overlay" style="z-index: 10000;">
+    <div class="modal-box confirm-box">
+      <div class="modal-header">
+        <h2>{{ utilsService.confirmTitle() }}</h2>
+      </div>
+      <div class="modal-body">
+        <p>{{ utilsService.confirmMessage() }}</p>
+      </div>
+      <div class="modal-footer right-actions">
+        <button class="btn-cancel" (click)="utilsService.closeConfirm()">Annuler</button>
+        <button class="btn-danger" (click)="utilsService.confirm()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+}

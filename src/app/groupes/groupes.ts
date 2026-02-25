@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GroupService } from '../Services/group-service';
+import { UtilsService } from '../Services/utils';
 import { Navigation } from '../Services/navigation';
 
 @Component({
@@ -12,6 +13,7 @@ import { Navigation } from '../Services/navigation';
 })
 export class Groupes implements OnInit {
   private readonly _groupService = inject(GroupService);
+  private readonly _utils = inject(UtilsService);
   _nav = inject(Navigation);
 
   activeTab = signal<string>('my-groups');
@@ -58,39 +60,31 @@ export class Groupes implements OnInit {
   joinGroup(group: any) {
     this._groupService.requestJoin(group.id).subscribe({
       next: () => {
-        alert('Demande envoyée pour le groupe ' + group.name);
+        this._utils.showToast('Demande envoyée pour ' + group.name, 'success');
         this.loadRandomPublicGroups();
       },
-      error: (err) => alert(err.error?.message || 'Erreur lors de la demande'),
+      error: (err) => this._utils.showToast(err.error?.message || 'Erreur lors de la demande', 'error'),
     });
   }
 
   createGroup() {
     this.creationError.set('');
-    
     if (!this.newGroup.name.trim() || this.isCreating()) return;
-
     this.isCreating.set(true);
 
-    this._groupService
-      .createGroup({
-        name: this.newGroup.name,
-        description: this.newGroup.description,
-      })
-      .subscribe({
-        next: (group) => {
-          alert('Groupe créé avec succès ! Code : ' + group.inviteCode);
-          this.newGroup = { name: '', description: '', isPublic: true };
-          this.activeTab.set('my-groups');
-          this.loadMyGroups();
-          this.loadRandomPublicGroups();
-          this.isCreating.set(false);
-        },
-        error: (err) => {
-          console.error('Erreur complète :', err);
-          this.creationError.set(err.error?.message || err.message || 'Erreur serveur');
-          this.isCreating.set(false);
-        },
-      });
+    this._groupService.createGroup({ name: this.newGroup.name, description: this.newGroup.description }).subscribe({
+      next: (group) => {
+        this._utils.showToast('Groupe créé ! Code : ' + group.inviteCode, 'success');
+        this.newGroup = { name: '', description: '', isPublic: true };
+        this.activeTab.set('my-groups');
+        this.loadMyGroups();
+        this.loadRandomPublicGroups();
+        this.isCreating.set(false);
+      },
+      error: (err) => {
+        this.creationError.set(err.error?.message || 'Erreur serveur');
+        this.isCreating.set(false);
+      },
+    });
   }
 }

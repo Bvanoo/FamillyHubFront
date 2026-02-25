@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { GroupService } from '../Services/group-service';
 import { SignalRService } from '../Services/signal-r';
 import { AuthService } from '../Services/auth-service';
+import { UtilsService } from '../Services/utils';
 import { Navigation } from '../Services/navigation';
 import { Calendar } from '../calendar/calendar';
 
@@ -19,6 +20,7 @@ export class GroupDetails implements OnInit, OnDestroy {
   private readonly _groupService = inject(GroupService);
   private readonly _signalRService = inject(SignalRService);
   private readonly _authService = inject(AuthService);
+  private readonly _utils = inject(UtilsService);
   _nav = inject(Navigation);
 
   groupId!: number;
@@ -36,9 +38,6 @@ export class GroupDetails implements OnInit, OnDestroy {
   isSearching = signal(false);
   secretSantaState = signal<any>({ isDrawn: false, isRevealed: false });
 
-  /**
-   * Initialisation du composant : récupération de l'ID, du user, du chat et des membres.
-   */
   ngOnInit() {
     this.currentUser = this._authService.getUser();
     this.groupId = Number(this._route.snapshot.paramMap.get('id'));
@@ -49,9 +48,6 @@ export class GroupDetails implements OnInit, OnDestroy {
     this.loadMySecretSantaTarget();
   }
 
-  /**
-   * Récupère les infos de base du groupe (Nom, description, etc.)
-   */
   loadGroupInfo() {
     this._groupService.getGroupById(this.groupId).subscribe({
       next: (data) => (this.groupDetails = data),
@@ -59,24 +55,14 @@ export class GroupDetails implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Connexion au Chat via SignalR.
-   */
   initChat() {
-    this._signalRService
-      .startConnection()
-      .then(() => {
+    this._signalRService.startConnection().then(() => {
         this._signalRService.joinGroup(this.groupId);
-        this._signalRService.addMessageListener(
-          (senderName, content, timestamp) => {
-            this.messages.update((prev) => [
-              ...prev,
-              { senderName, content, timestamp },
-            ]);
-          },
-        );
-      })
-      .catch((err) => console.error('Impossible de se connecter au chat', err));
+        this._signalRService.addMessageListener((senderName, content, timestamp) => {
+            this.messages.update((prev) => [...prev, { senderName, content, timestamp }]);
+          });
+      }).catch((err) => console.error('Impossible de se connecter au chat', err));
+      
     this._groupService.getGroupMessages(this.groupId).subscribe({
       next: (history) => this.messages.set(history),
       error: (err) => console.error('Erreur historique:', err),
@@ -88,12 +74,8 @@ export class GroupDetails implements OnInit, OnDestroy {
       next: (membres) => {
         this.members.set(membres);
         const myProfile = membres.find((m) => m.userId == this.currentUser.id);
-
-        if (myProfile && myProfile.role === 'Admin') {
-          this.isAdmin.set(true);
-        } else {
-          this.isAdmin.set(false);
-        }
+        if (myProfile && myProfile.role === 'Admin') this.isAdmin.set(true);
+        else this.isAdmin.set(false);
       },
       error: (err) => console.error('Erreur chargement membres:', err),
     });
@@ -103,82 +85,48 @@ export class GroupDetails implements OnInit, OnDestroy {
     const targetUserId = user.id || user.Id;
     this._groupService.inviteUserToGroup(this.groupId, targetUserId).subscribe({
       next: () => {
-        alert(
-          `${user.name || user.Name} a été ajouté(e) au groupe avec succès !`,
-        );
-        this.searchResults.update((results) =>
-          results.filter((u) => (u.id || u.Id) !== targetUserId),
-        );
+        this._utils.showToast(`${user.name || user.Name} a été ajouté(e) au groupe !`, 'success');
+        this.searchResults.update((res) => res.filter((u) => (u.id || u.Id) !== targetUserId));
         this.loadMembers();
       },
-      error: (err) => {
-        console.error("Erreur lors de l'ajout", err);
-        alert("Impossible d'ajouter l'utilisateur.");
-      },
+      error: () => this._utils.showToast("Impossible d'ajouter l'utilisateur.", 'error'),
     });
   }
 
-  /**
-   * Déconnexion de SignalR lors de la destruction du composant.
-   */
   ngOnDestroy() {
     this._signalRService.leaveGroup(this.groupId);
   }
 
-  /**
-   * Envoi d'un message dans le chat du groupe.
-   */
   sendMessage() {
     if (!this.newMessage.trim()) return;
-    this._signalRService.sendMessageToGroup(
-      this.groupId,
-      this.newMessage,
-      this.currentUser.id.toString(),
-      this.currentUser.name,
-    );
+    this._signalRService.sendMessageToGroup(this.groupId, this.newMessage, this.currentUser.id.toString(), this.currentUser.name);
     this.newMessage = '';
   }
 
-  /**
-   * Suppression définitive du groupe (Action Admin).
-   */
   deleteGroup() {
-    if (
-      confirm(
-        'Êtes-vous sûr de vouloir supprimer définitivement ce groupe ? Cette action est irréversible.',
-      )
-    ) {
+    this._utils.openConfirm('Supprimer le groupe', 'Êtes-vous sûr de vouloir supprimer définitivement ce groupe ?', () => {
       this._groupService.deleteGroup(this.groupId).subscribe({
         next: () => {
-          alert('Groupe supprimé.');
-          this._nav.goToGroupes();
+          this._utils.showToast('Groupe supprimé.', 'success');
+          setTimeout(() => this._nav.goToGroupes(), 1000);
         },
-        error: (err) =>
-          alert(err.error?.message || 'Erreur lors de la suppression.'),
+        error: (err) => this._utils.showToast(err.error?.message || 'Erreur lors de la suppression.', 'error')
       });
-    }
+    });
   }
 
-  /**
-   * Transfert des droits d'administration à un autre membre.
-   */
   transferRole(newAdminId: number, memberName: string) {
-    if (
-      confirm(
-        `Voulez-vous transférer vos droits d'Admin à ${memberName} ? Vous deviendrez un membre normal.`,
-      )
-    ) {
+    this._utils.openConfirm('Transférer les droits', `Voulez-vous transférer vos droits d'Admin à ${memberName} ?`, () => {
       this._groupService.transferAdmin(this.groupId, newAdminId).subscribe({
         next: () => {
-          alert(`Les droits ont été transférés à ${memberName}.`);
+          this._utils.showToast(`Droits transférés à ${memberName}.`, 'success');
           this.isAdmin.set(false);
           this.activeTab.set('chat');
           this.loadMembers();
         },
-        error: (err) =>
-          alert(err.error?.message || 'Erreur lors du transfert.'),
+        error: (err) => this._utils.showToast(err.error?.message || 'Erreur lors du transfert.', 'error')
       });
-    }
+    });
   }
 
   openInviteModal() {
@@ -195,10 +143,7 @@ export class GroupDetails implements OnInit, OnDestroy {
   searchUsers() {
     this.isSearching.set(true);
     const querySafe = this.searchQuery() ? this.searchQuery().trim() : '';
-
-    this._groupService
-      .searchUsersNotInGroup(this.groupId, querySafe)
-      .subscribe({
+    this._groupService.searchUsersNotInGroup(this.groupId, querySafe).subscribe({
         next: (users) => {
           this.searchResults.set(users);
           this.isSearching.set(false);
@@ -209,23 +154,19 @@ export class GroupDetails implements OnInit, OnDestroy {
         },
       });
   }
-  /**
-   * Retire un membre du groupe (Action Admin).
-   */
+
   removeMember(userId: number, memberName: string) {
-    if (confirm(`Êtes-vous sûr de vouloir retirer ${memberName} du groupe ?`)) {
+    this._utils.openConfirm('Retirer le membre', `Voulez-vous retirer ${memberName} du groupe ?`, () => {
       this._groupService.removeMemberFromGroup(this.groupId, userId).subscribe({
         next: () => {
-          alert(`${memberName} a été retiré(e) du groupe.`);
+          this._utils.showToast(`${memberName} a été retiré(e).`, 'success');
           this.loadMembers();
         },
-        error: (err) => {
-          console.error('Erreur lors du retrait du membre', err);
-          alert('Impossible de retirer ce membre.');
-        },
+        error: () => this._utils.showToast('Impossible de retirer ce membre.', 'error')
       });
-    }
+    });
   }
+
   loadMySecretSantaTarget() {
     this._groupService.getMySecretSantaTarget(this.groupId).subscribe({
       next: (state) => this.secretSantaState.set(state),
@@ -235,52 +176,38 @@ export class GroupDetails implements OnInit, OnDestroy {
 
   triggerSecretSanta() {
     if (this.members().length < 3) {
-      alert('Il faut au moins 3 membres dans le groupe pour lancer un tirage.');
+      this._utils.showToast('Il faut au moins 3 membres pour lancer un tirage.', 'error');
       return;
     }
-    if (confirm('Lancer le tirage de cette année ?')) {
+    this._utils.openConfirm('Lancer le tirage', 'Lancer le tirage de cette année ?', () => {
       this._groupService.drawSecretSanta(this.groupId).subscribe({
         next: () => {
-          alert(
-            'Tirage effectué ! Chaque membre peut maintenant découvrir sa cible.',
-          );
+          this._utils.showToast('Tirage effectué !', 'success');
           this.loadMySecretSantaTarget();
         },
-        error: (err) => alert(err.error || 'Erreur lors du tirage.'),
+        error: (err) => this._utils.showToast(err.error || 'Erreur lors du tirage.', 'error')
       });
-    }
+    });
   }
 
   revealTarget() {
     this._groupService.revealSecretSanta(this.groupId).subscribe({
       next: (targetInfo) => {
-        this.secretSantaState.set({
-          isDrawn: true,
-          isRevealed: true,
-          ...targetInfo,
-        });
+        this.secretSantaState.set({ isDrawn: true, isRevealed: true, ...targetInfo });
       },
-      error: (err) => alert('Impossible de révéler la cible pour le moment.'),
+      error: (err) => this._utils.showToast('Impossible de révéler la cible pour le moment.', 'error')
     });
   }
 
   resetSecretSanta() {
-    if (
-      confirm(
-        'Voulez-vous vraiment annuler le tirage actuel ? Personne ne saura plus à qui offrir !',
-      )
-    ) {
+    this._utils.openConfirm('Annuler le tirage', 'Voulez-vous vraiment annuler le tirage actuel ?', () => {
       this._groupService.resetSecretSanta(this.groupId).subscribe({
         next: () => {
-          alert('Le tirage a été réinitialisé.');
+          this._utils.showToast('Tirage réinitialisé.', 'success');
           this.loadMySecretSantaTarget();
         },
-        error: (err) => alert('Erreur lors de la réinitialisation.'),
+        error: () => this._utils.showToast('Erreur lors de la réinitialisation.', 'error')
       });
-    }
+    });
   }
-
-  // openPrivateChat(targetId: number) {
-  //   this._router.navigate(['/messenger'], { queryParams: { targetUserId: targetId } });
-  // }
 }

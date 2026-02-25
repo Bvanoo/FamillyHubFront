@@ -1,0 +1,41 @@
+.toast-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    z-index: 99999;
+    animation: slideInToast 0.3s ease forwards;
+}
+
+.toast-container.success { background-color: #10b981; }
+.toast-container.error { background-color: #ef4444; }
+.toast-container.info { background-color: #3b82f6; }
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+@keyframes slideInToast {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.confirm-box {
+    max-width: 400px;
+    text-align: center;
+}
+
+.confirm-box .modal-body {
+    font-size: 1rem;
+    color: #475569;
+}
+
+.confirm-box .right-actions {
+    justify-content: center;
+}

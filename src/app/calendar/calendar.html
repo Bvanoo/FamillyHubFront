@@ -200,30 +200,3 @@
   </div>
   }
 </div>
-@if (toastVisible) {
-  <div class="toast-container" [ngClass]="toastType">
-    <div class="toast-content">
-      @if (toastType === 'success') { <i class="fas fa-check-circle"></i> }
-      @if (toastType === 'error') { <i class="fas fa-exclamation-triangle"></i> }
-      @if (toastType === 'info') { <i class="fas fa-info-circle"></i> }
-      <span>{{ toastMessage }}</span>
-    </div>
-  </div>
-}
-
-@if (confirmModal.isOpen) {
-  <div class="modal-overlay" style="z-index: 10000;">
-    <div class="modal-box confirm-box">
-      <div class="modal-header">
-        <h2>{{ confirmModal.title }}</h2>
-      </div>
-      <div class="modal-body">
-        <p>{{ confirmModal.message }}</p>
-      </div>
-      <div class="modal-footer right-actions">
-        <button class="btn-cancel" (click)="closeConfirm()">Annuler</button>
-        <button class="btn-danger" (click)="confirmModal.onConfirm()">Confirmer</button>
-      </div>
-    </div>
-  </div>
-}
