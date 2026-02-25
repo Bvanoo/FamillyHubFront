@@ -118,7 +118,7 @@ export class Calendar implements OnInit {
             displayTitle = `🔒 ${displayTitle}`;
           }
 
-          let picUrl = e.userPicture || e.UserPicture;
+          let picUrl = e.userPicture;
           if (picUrl && !picUrl.startsWith('http')) {
             picUrl = `${this._nav.baseUrlProd}${picUrl}`;
           }

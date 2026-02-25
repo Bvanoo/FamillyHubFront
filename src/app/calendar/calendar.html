@@ -1,12 +1,12 @@
 <div class="calendar-wrapper">
-
-  <header class="page-header">
+  
+  <header class="page-header" *ngIf="!groupId()">
     <h1>Planning & Dispos</h1>
   </header>
 
-  <section class="calendar-layout">
-
-    <aside class="card sidebar-config">
+  <section class="calendar-layout" [class.full-width]="groupId()">
+    
+    <aside class="card sidebar-config" *ngIf="!groupId()">
       <div class="config-section">
         <h3>Instructions</h3>
         <p class="instruction-text">
@@ -32,6 +32,8 @@
   </section>
 
   <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+     </div>
+</div>
     <div class="card modal-box" (click)="$event.stopPropagation()">
 
       <div class="modal-header">
@@ -109,5 +111,3 @@
       </div>
 
     </div>
-  </div>
-</div>
