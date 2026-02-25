@@ -32,15 +32,15 @@ export class Calendar implements OnInit {
 
   showModal = false;
   isEditMode = false;
+  isReadOnly = false;
   userId: number = 0;
   selectedEventId: number | null = null;
   myGroups: any[] = [];
 
-  // Variables pour les tâches
   newTaskTitle: string = '';
   newTaskAssignedUserIds: string[] = [];
   groupMembers: any[] = [];
-  isAddingTask: boolean = false; // <-- AJOUT ICI
+  isAddingTask: boolean = false;
 
   tempEvent: any = {
     title: '', description: '', start: '', end: '', color: '#3b82f6',
@@ -149,6 +149,7 @@ export class Calendar implements OnInit {
 
   handleSelect(selectInfo: DateSelectArg) {
     this.isEditMode = false;
+    this.isReadOnly = false;
     this.resetTempEvent();
     this.tempEvent.start = this.formatForInput(selectInfo.startStr, selectInfo.allDay);
     this.tempEvent.end = this.formatForInput(selectInfo.endStr, selectInfo.allDay, true);
@@ -158,18 +159,22 @@ export class Calendar implements OnInit {
 
   handleEventClick(clickInfo: EventClickArg) {
     const props = clickInfo.event.extendedProps;
-    if (props['userId'] !== this.userId && props['isPrivate']) return;
+    const eventOwnerId = props['userId'];
+    const eventGroupId = props['groupId'];
+
+    if (eventOwnerId !== this.userId && props['isPrivate']) return;
 
     this.isEditMode = true;
     this.selectedEventId = Number(clickInfo.event.id);
+    this.isReadOnly = (eventOwnerId !== this.userId && !eventGroupId);
 
     this.tempEvent = {
-      userId: props['userId'] || this.userId, title: props['realTitle'], description: props['realDescription'],
+      userId: eventOwnerId || this.userId, title: props['realTitle'], description: props['realDescription'],
       start: this.formatForInput(clickInfo.event.startStr, clickInfo.event.allDay),
       end: clickInfo.event.endStr ? this.formatForInput(clickInfo.event.endStr, clickInfo.event.allDay, true) : this.formatForInput(clickInfo.event.startStr, clickInfo.event.allDay),
       color: clickInfo.event.backgroundColor, type: props['type'] || 'Disponible',
       isPrivate: props['isPrivate'] || false, maskDetails: props['maskDetails'] || false,
-      groupId: props['groupId'] || null, tasks: props['tasks'] || []
+      groupId: eventGroupId || null, tasks: props['tasks'] || []
     };
 
     if (this.tempEvent.groupId) this.fetchGroupMembers(this.tempEvent.groupId);
@@ -177,6 +182,8 @@ export class Calendar implements OnInit {
   }
 
   saveEvent() {
+    if (this.isReadOnly) return;
+
     if (!this.tempEvent.start || !this.tempEvent.end) {
       this._utils.showToast('Veuillez sélectionner une plage horaire valide.', 'error');
       return;
@@ -207,9 +214,9 @@ export class Calendar implements OnInit {
   }
 
   addTask() {
-    if (!this.selectedEventId || !this.newTaskTitle.trim()) return;
+    if (this.isReadOnly || !this.selectedEventId || !this.newTaskTitle.trim()) return;
     
-    this.isAddingTask = true; // <-- AJOUT ICI
+    this.isAddingTask = true;
     const dto = { title: this.newTaskTitle, assignedUserIds: this.newTaskAssignedUserIds.map(id => id.toString()) };
 
     this._calendarService.addTaskToEvent(this.selectedEventId, dto).subscribe({
@@ -223,17 +230,19 @@ export class Calendar implements OnInit {
         this.newTaskAssignedUserIds = [];
         this.loadUnifiedEvents();
         this._utils.showToast('Tâche ajoutée.', 'success');
-        this.isAddingTask = false; // <-- AJOUT ICI
+        this.isAddingTask = false;
       },
       error: (err) => {
         console.error(err);
         this._utils.showToast('Erreur lors de l\'ajout de la tâche.', 'error');
-        this.isAddingTask = false; // <-- AJOUT ICI
+        this.isAddingTask = false;
       }
     });
   }
 
   toggleTaskStatus(task: any) {
+    if (this.isReadOnly) return;
+
     const newStatus = !task.isCompleted;
     task.isCompleted = newStatus;
     this._calendarService.toggleTaskStatus(task.id || task.Id, newStatus).subscribe({
@@ -246,6 +255,8 @@ export class Calendar implements OnInit {
   }
 
   deleteTask(taskId: number) {
+    if (this.isReadOnly) return;
+
     this._utils.openConfirm('Supprimer la tâche', 'Voulez-vous vraiment supprimer cette tâche ?', () => {
       this._calendarService.deleteTask(taskId).subscribe({
         next: () => {
@@ -259,6 +270,8 @@ export class Calendar implements OnInit {
   }
 
   deleteEvent() {
+    if (this.isReadOnly) return;
+
     if (this.selectedEventId) {
       this._utils.openConfirm('Supprimer l\'événement', 'Voulez-vous vraiment supprimer cet événement ?', () => {
         this._calendarService.deleteEvent(this.selectedEventId!).subscribe({

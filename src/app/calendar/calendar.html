@@ -42,7 +42,8 @@
     <div class="modal-box" (click)="$event.stopPropagation()">
 
       <div class="modal-header">
-        <h2>{{ isEditMode ? 'Modifier l\'événement' : 'Nouvel événement' }}</h2>
+        <h2>{{ isReadOnly ? 'Détails de l\'événement' : (isEditMode ? 'Modifier l\'événement' : 'Nouvel événement') }}
+        </h2>
       </div>
 
       <div class="modal-body">
@@ -50,21 +51,21 @@
         <div class="input-group">
           <label>Titre de l'événement</label>
           <input type="text" class="custom-input" [(ngModel)]="tempEvent.title"
-            placeholder="Ex: Repas de famille, Dentiste...">
+            placeholder="Ex: Repas de famille, Dentiste..." [disabled]="isReadOnly">
         </div>
 
         <div class="input-row">
           <div class="input-group">
             <label>Date et heure de début</label>
-            <input type="datetime-local" class="custom-input" [(ngModel)]="tempEvent.start">
+            <input type="datetime-local" class="custom-input" [(ngModel)]="tempEvent.start" [disabled]="isReadOnly">
           </div>
           <div class="input-group">
             <label>Date et heure de fin</label>
-            <input type="datetime-local" class="custom-input" [(ngModel)]="tempEvent.end">
+            <input type="datetime-local" class="custom-input" [(ngModel)]="tempEvent.end" [disabled]="isReadOnly">
           </div>
         </div>
 
-        @if (tempEvent.groupId === null) {
+        @if (tempEvent.groupId === null && !isReadOnly) {
         <div class="input-group">
           <label>Confidentialité</label>
           <div class="checkbox-row">
@@ -83,7 +84,7 @@
         <div class="color-picker-group">
           <label>Couleur</label>
 
-          @if (tempEvent.groupId === null) {
+          @if (tempEvent.groupId === null && !isReadOnly) {
           <div class="color-presets">
             <div class="color-swatch" [style.background-color]="'#3b82f6'" (click)="tempEvent.color = '#3b82f6'"
               [class.active]="tempEvent.color === '#3b82f6'"></div>
@@ -104,7 +105,7 @@
 
           <div class="custom-color-section">
             <input type="color" class="rect-color-input" [(ngModel)]="tempEvent.color"
-              [disabled]="tempEvent.groupId !== null">
+              [disabled]="tempEvent.groupId !== null || isReadOnly">
           </div>
           <hr class="separator">
 
@@ -112,38 +113,39 @@
           <div class="tasks-section">
             <h3><i class="fas fa-tasks"></i> Tâches à faire ({{ tempEvent.tasks?.length || 0 }})</h3>
 
-           <ul class="task-list">
-                @for (task of tempEvent.tasks; track task.id || task.Id) {
-                  
-                  <li class="task-item" [class.completed]="task.isCompleted">
-                    
-                    <input type="checkbox" 
-                           class="task-checkbox" 
-                           [checked]="task.isCompleted" 
-                           (change)="toggleTaskStatus(task)">
+            <ul class="task-list">
+              @for (task of tempEvent.tasks; track task.id || task.Id) {
 
-                    <div class="task-info">
-                      <span class="task-title">{{ task.title || task.Title }}</span>
-                      
-                      @if ((task.assignedUserNames?.length > 0) || (task.AssignedUserNames?.length > 0)) {
-                        <span class="task-assignees">
-                          <i class="fas fa-user-tag"></i> {{ (task.assignedUserNames || task.AssignedUserNames).join(', ') }}
-                        </span>
-                      }
-                    </div>
+              <li class="task-item" [class.completed]="task.isCompleted">
 
-                    <button class="btn-icon-danger" (click)="deleteTask(task.id || task.Id)" title="Supprimer">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
+                <input type="checkbox" class="task-checkbox" [checked]="task.isCompleted"
+                  (change)="toggleTaskStatus(task)" [disabled]="isReadOnly">
 
-                  </li>
+                <div class="task-info">
+                  <span class="task-title">{{ task.title || task.Title }}</span>
+
+                  @if ((task.assignedUserNames?.length > 0) || (task.AssignedUserNames?.length > 0)) {
+                  <span class="task-assignees">
+                    <i class="fas fa-user-tag"></i> {{ (task.assignedUserNames || task.AssignedUserNames).join(', ') }}
+                  </span>
+                  }
+                </div>
+
+                @if (!isReadOnly) {
+                <button class="btn-icon-danger" (click)="deleteTask(task.id || task.Id)" title="Supprimer">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
                 }
-                
-                @if (tempEvent.tasks?.length === 0) {
-                  <p class="no-tasks">Aucune tâche pour le moment.</p>
-                }
-              </ul>
 
+              </li>
+              }
+
+              @if (tempEvent.tasks?.length === 0) {
+              <p class="no-tasks">Aucune tâche pour le moment.</p>
+              }
+            </ul>
+
+            @if (!isReadOnly) {
             <div class="add-task-form card-light">
               <div class="input-group">
                 <input type="text" class="custom-input" [(ngModel)]="newTaskTitle" (keyup.enter)="addTask()"
@@ -170,6 +172,7 @@
                 }
               </button>
             </div>
+            }
           </div>
           } @else {
           <div class="tasks-info-box">
@@ -182,17 +185,20 @@
       </div>
 
       <div class="modal-footer">
-        @if (isEditMode) {
+        @if (isEditMode && !isReadOnly) {
         <button class="btn-danger" (click)="deleteEvent()">Supprimer</button>
         } @else {
         <div></div>
         }
 
         <div class="right-actions">
-          <button class="btn-cancel" (click)="closeModal()">Annuler</button>
+          <button class="btn-cancel" (click)="closeModal()">{{ isReadOnly ? 'Fermer' : 'Annuler' }}</button>
+
+          @if (!isReadOnly) {
           <button class="btn-primary" (click)="saveEvent()">
             {{ isEditMode ? 'Mettre à jour' : 'Enregistrer' }}
           </button>
+          }
         </div>
       </div>
 
