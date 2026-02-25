@@ -1,55 +1,61 @@
-<div class="app">
-  <main class="content">
-    <header class="header">
-      <h1>Mon Profil</h1>
-      <button class="btn-logout" (click)="logout()">Se déconnecter</button>
-    </header>
+<div class="profile-wrapper">
+  
+  <header class="page-header">
+    <h1>Mon Profil</h1>
+    <button class="btn-danger-sm" (click)="logout()" aria-label="Se déconnecter">
+      <i class="fas fa-sign-out-alt"></i> <span class="hide-mobile">Se déconnecter</span>
+    </button>
+  </header>
 
-    <div class="profile-grid">
-      
-      <aside class="profile-sidebar">
-        <div class="card avatar-card">
-          <div class="avatar-wrapper" (click)="fileInput.click()" title="Cliquez pour changer la photo">
-            
-            <img [src]="urlPic()"
-                 alt="Avatar" 
-                 id="user-avatar">
-            
-            <div class="avatar-overlay">
-              <i class="fas fa-camera"></i>
-            </div>
+  <div class="profile-layout">
+    
+    <aside class="profile-sidebar">
+      <div class="card avatar-card">
+        
+        <div class="avatar-wrapper" (click)="fileInput.click()" title="Cliquez pour changer la photo">
+          <img [src]="urlPic()" alt="Avatar" id="user-avatar" onerror="this.src='FamHubIcon.png'">
+          <div class="avatar-overlay">
+            <i class="fas fa-camera"></i>
           </div>
-          
-          <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none;">
-
-          <h2>{{ userData().name }}</h2>
-          <p>Membre FamilyHub</p>
         </div>
-      </aside>
+        
+        <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none;">
 
-      <section class="profile-details">
-        <div class="card">
-          <h3>Informations personnelles</h3>
-          
-          <div class="input-group">
-            <label>Nom complet</label>
-            <input type="text" name="name" [(ngModel)]="formName">
+        <h2>{{ userData().name }}</h2>
+        <p class="user-role">Membre FamilyHub</p>
+      </div>
+    </aside>
+
+    <section class="profile-details">
+      <div class="card">
+        <h3 class="section-title">Informations personnelles</h3>
+        
+        <div class="form-group">
+          <label>Nom complet</label>
+          <div class="input-wrapper">
+            <i class="fas fa-user"></i>
+            <input type="text" class="custom-input" name="name" [(ngModel)]="formName" placeholder="Votre nom">
           </div>
-
-          <div class="input-group">
-            <label>E-mail</label>
-            <input type="email" name="email" [value]="userData().email" readonly class="readonly-input">
-          </div>
-
-          <div class="actions">
-            <button class="btn-save" (click)="saveChanges()" [disabled]="isSaving">
-              {{ isSaving ? 'Sauvegarde...' : 'Enregistrer les modifications' }}
-            </button>
-          </div>
-
         </div>
-      </section>
 
-    </div>
-  </main>
+        <div class="form-group">
+          <label>E-mail</label>
+          <div class="input-wrapper">
+            <i class="fas fa-envelope"></i>
+            <input type="email" class="custom-input readonly-input" name="email" [value]="userData().email" readonly title="L'email ne peut pas être modifié">
+          </div>
+        </div>
+
+        <div class="actions-row">
+          <button class="btn-primary" (click)="saveChanges()" [disabled]="isSaving">
+            <i class="fas fa-save" *ngIf="!isSaving"></i>
+            <i class="fas fa-spinner fa-spin" *ngIf="isSaving"></i>
+            {{ isSaving ? 'Sauvegarde en cours...' : 'Enregistrer les modifications' }}
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
 </div>
