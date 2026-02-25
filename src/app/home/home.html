@@ -1,8 +1,10 @@
 <div class="home-container">
-  <h2>📅 Prochains événements à venir</h2>
+  <h2><i class="fas fa-calendar-day"></i> Prochains événements à venir</h2>
   
   @if (upcomingEvents.length === 0) {
-    <p class="no-events">Aucun événement prévu pour le moment. Profitez de votre temps libre !</p>
+    <p class="no-events">
+      <i class="fas fa-bed"></i> Aucun événement prévu pour le moment. Profitez de votre temps libre !
+    </p>
   } @else {
     <div class="events-grid">
       @for (event of upcomingEvents; track event.id) {
@@ -21,21 +23,20 @@
             </div>
             
             <span class="badge" [ngClass]="event.isGroupEvent ? 'group-badge' : 'perso-badge'">
+              <i class="fas" [ngClass]="event.isGroupEvent ? 'fa-users' : 'fa-user'"></i>
               {{ event.isGroupEvent ? 'Groupe' : 'Perso' }}
             </span>
           </div>
 
           <div class="card-body">
             <h3 class="event-title">{{ event.title }}</h3>
-            <p class="event-date">🕒 {{ event.parsedStart | date:'dd/MM/yyyy HH:mm' }}</p>
+            <p class="event-date"><i class="fas fa-clock"></i> {{ event.parsedStart | date:'dd/MM/yyyy HH:mm' }}</p>
             
             @if (event.description) {
               <p class="event-desc">{{ event.description }}</p>
             }
           </div>
-    
         </div>
-
       }
     </div>
   }

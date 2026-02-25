@@ -1,25 +1,23 @@
 <div class="app">
   <main class="content">
-
     <header class="header">
-      <h1>Randomizer</h1>
-      <button class="btn-primary">Historique</button>
+      <h1><i class="fas fa-random"></i> Randomizer</h1>
+      <button class="btn-primary"><i class="fas fa-history"></i> Historique</button>
     </header>
 
     <section class="randomizer-layout">
-
       <div class="card config-window">
-        <h2>Configuration</h2>
+        <h2><i class="fas fa-sliders-h"></i> Configuration</h2>
         
         <div class="mode-selector">
           <button class="mode-btn" [class.active]="mode() === 'cacahuete'" (click)="setMode('cacahuete')">
-            <span class="icon"></span>
+            <span class="icon"><i class="fas fa-user-secret"></i></span>
             <strong>Cacahuète</strong>
             <small>Tirage croisé secret</small>
           </button>
           
           <button class="mode-btn" [class.active]="mode() === 'tache'" (click)="setMode('tache')">
-            <span class="icon"></span>
+            <span class="icon"><i class="fas fa-tasks"></i></span>
             <strong>Tâche</strong>
             <small>Assigner un élu au hasard</small>
           </button>
@@ -38,19 +36,20 @@
                 <strong>{{ drawResult() }}</strong> 
               </p>
             } @else {
-              <p>Sélectionnez un groupe et lancez le tirage</p>
+              <p><i class="fas fa-info-circle"></i> Sélectionnez un groupe et lancez le tirage</p>
             }
           </div>
         </div>
 
         <button class="btn-primary btn-launch" [disabled]="isDrawing()" (click)="launchDraw()">
+          <i class="fas" [class.fa-spinner]="isDrawing()" [class.fa-play]="!isDrawing()" [class.fa-spin]="isDrawing()"></i>
           {{ isDrawing() ? 'Tirage en cours...' : 'Lancer le tirage' }}
         </button>
       </div>
 
       <div class="card groups-panel">
         <div class="panel-header">
-          <h2>Sélection du groupe</h2>
+          <h2><i class="fas fa-users"></i> Sélection du groupe</h2>
         </div>
 
         <div class="groups-selection-area">
@@ -58,7 +57,6 @@
             <label for="group-picker">Groupe actif</label>
             <select id="group-picker" class="group-select" (change)="onGroupChange($event)">
               <option value="" disabled selected>-- Choisir un groupe --</option>
-              
               @for (group of groups; track group.id) {
                 <option [value]="group.id">{{ group.name }}</option>
               }
@@ -68,22 +66,19 @@
           <div class="participants-list-container">
             <h3>Membres du groupe ({{ currentMembers.length }})</h3>
             <ul id="participants-list" class="members-display">
-              
               @if (currentMembers.length === 0) {
-                <li class="placeholder-text">Aucun groupe sélectionné</li>
+                <li class="placeholder-text"><i class="fas fa-users-slash"></i> Aucun groupe sélectionné</li>
               } @else {
                 @for (member of currentMembers; track member) {
-                  <li>👤 {{ member }}</li>
+                  <li><i class="fas fa-user"></i> {{ member }}</li>
                 }
               }
-
             </ul>
           </div>
         </div>
 
-        <button class="btn-secondary">Gérer les membres</button>
+        <button class="btn-secondary"><i class="fas fa-user-edit"></i> Gérer les membres</button>
       </div>
-
     </section>
   </main>
 </div>
