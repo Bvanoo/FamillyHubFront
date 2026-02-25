@@ -2,7 +2,9 @@
     <i class="fas fa-bars"></i>
 </button>
 
-<div class="sidebar-overlay" *ngIf="isMenuOpen()" (click)="closeMenu()"></div>
+@if (isMenuOpen()) {
+    <div class="sidebar-overlay" (click)="closeMenu()"></div>
+}
 
 <nav class="sidebar" [class.open]="isMenuOpen()">
     

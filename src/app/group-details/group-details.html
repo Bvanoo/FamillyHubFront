@@ -1,173 +1,192 @@
-<div class="group-details-wrapper" *ngIf="groupId">
-
-  <header class="page-header">
-    <div class="header-title-row">
-      <button class="btn-icon" (click)="_nav.goBack()" aria-label="Retour">
-        <i class="fas fa-arrow-left"></i>
-      </button>
-      <h1>👥 {{ groupDetails?.name || groupDetails?.Name || 'Groupe #' + groupId }}</h1>
-    </div>
-
-    <div class="header-actions">
-      <div class="tabs-scroll">
-        <button class="btn-tab" (click)="activeTab.set('chat')" [class.active]="activeTab() === 'chat'">💬 Chat</button>
-        <button class="btn-tab" (click)="activeTab.set('randomizer')" [class.active]="activeTab() === 'randomizer'">🎁 Secret Santa</button>
-        <button class="btn-tab" (click)="activeTab.set('calendar')" [class.active]="activeTab() === 'calendar'">📅 Calendrier</button>
-        <button class="btn-tab" (click)="activeTab.set('settings')" [class.active]="activeTab() === 'settings'">⚙️ Paramètres</button>
-      </div>
-      
-      <button class="btn-primary" (click)="openInviteModal()">
-        <i class="fas fa-user-plus"></i> <span class="hide-mobile">Inviter</span>
-      </button>
-    </div>
-  </header>
-
-  <section class="group-layout">
-
-    <div class="card chat-section" *ngIf="activeTab() === 'chat'">
-      <div class="messages-container">
-        <div *ngFor="let msg of messages()" class="message" [class.my-message]="msg.senderName === currentUser.name">
-          <div class="msg-header">
-            <strong>{{ msg.senderName }}</strong>
-            <small>{{ msg.timestamp | date:'shortTime' }}</small>
-          </div>
-          <p>{{ msg.content }}</p>
-        </div>
+<div class="group-details-wrapper">
+  @if (groupId) {
+    <header class="page-header">
+      <div class="header-title-row">
+        <button class="btn-icon" (click)="_nav.goBack()" aria-label="Retour">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <h1>👥 {{ groupDetails?.name || groupDetails?.Name || 'Groupe #' + groupId }}</h1>
       </div>
 
-      <div class="chat-input-row">
-        <input type="text" class="custom-input" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()"
-          placeholder="Écrivez un message...">
-        <button class="btn-primary" (click)="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+      <div class="header-actions">
+        <div class="tabs-scroll">
+          <button class="btn-tab" (click)="activeTab.set('chat')" [class.active]="activeTab() === 'chat'">💬 Chat</button>
+          <button class="btn-tab" (click)="activeTab.set('randomizer')" [class.active]="activeTab() === 'randomizer'">🎁 Secret Santa</button>
+          <button class="btn-tab" (click)="activeTab.set('calendar')" [class.active]="activeTab() === 'calendar'">📅 Calendrier</button>
+          <button class="btn-tab" (click)="activeTab.set('settings')" [class.active]="activeTab() === 'settings'">⚙️ Paramètres</button>
+        </div>
+        
+        <button class="btn-primary" (click)="openInviteModal()">
+          <i class="fas fa-user-plus"></i> <span class="hide-mobile">Inviter</span>
+        </button>
       </div>
-    </div>
+    </header>
 
-    <div class="card randomizer-section" *ngIf="activeTab() === 'randomizer'">
-      <div class="secret-santa-wrapper">
+    <section class="group-layout">
 
-        <h2 class="santa-title">🎁 Secret Santa {{ currentUser?.year || '' }}</h2>
-
-        <div class="no-draw" *ngIf="!secretSantaState().isDrawn">
-          <div class="santa-icon">🎲</div>
-          <p class="santa-desc">Aucun tirage n'a encore été effectué pour cette année.</p>
-
-          <button *ngIf="isAdmin()" class="btn-santa-action" (click)="triggerSecretSanta()">
-            Lancer le tirage au sort !
-          </button>
-          <p *ngIf="!isAdmin()" class="santa-wait">⏳ Attendez que l'administrateur lance le tirage.</p>
-        </div>
-
-        <div class="hidden-target" *ngIf="secretSantaState().isDrawn && !secretSantaState().isRevealed">
-          <div class="santa-icon animated-bounce">📦</div>
-          <h3>Le tirage a eu lieu !</h3>
-          <p class="santa-desc">Votre cible vous attend sagement dans cette boîte virtuelle.</p>
-
-          <button class="btn-santa-reveal" (click)="revealTarget()">
-            🎁 Révéler ma cible
-          </button>
-        </div>
-
-        <div class="target-reveal" *ngIf="secretSantaState().isDrawn && secretSantaState().isRevealed">
-          <h3>🎉 Vous êtes le Secret Santa de :</h3>
-
-          <div class="target-card">
-            <img [src]="secretSantaState().targetPicture ? 'https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net' + secretSantaState().targetPicture : 'assets/default-avatar.png'"
-              alt="Avatar Cible" class="target-avatar" onerror="this.src='FamHubIcon.png'">
-            <span class="target-name">{{ secretSantaState().targetName }}</span>
+      @if (activeTab() === 'chat') {
+        <div class="card chat-section">
+          <div class="messages-container">
+            @for (msg of messages(); track msg.timestamp) {
+              <div class="message" [class.my-message]="msg.senderName === currentUser.name">
+                <div class="msg-header">
+                  <strong>{{ msg.senderName }}</strong>
+                  <small>{{ msg.timestamp | date:'shortTime' }}</small>
+                </div>
+                <p>{{ msg.content }}</p>
+              </div>
+            }
           </div>
 
-          <p class="santa-secret-text">Chut ! C'est un secret. Ne le dites à personne ! 🤫</p>
-        </div>
-
-        <div class="santa-admin-zone" *ngIf="isAdmin() && secretSantaState().isDrawn">
-          <button class="btn-danger-outline" (click)="resetSecretSanta()">
-            🔄 Réinitialiser le tirage
-          </button>
-          <p class="admin-note">(Action Admin : annule le tirage pour tout le monde)</p>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="card calendar-container" *ngIf="activeTab() === 'calendar'">
-      <app-calendar [groupId]="groupId"></app-calendar>
-    </div>
-
-    <div class="card settings-section" *ngIf="activeTab() === 'settings'">
-      <h3 class="section-title">Membres du groupe</h3>
-
-      <ul class="member-list">
-        <li *ngFor="let member of members()" class="member-item">
-          
-          <div class="member-info">
-            <strong>{{ member.name || member.Name }}</strong>
-            <span *ngIf="member.role === 'Admin'" class="badge-admin">👑 Admin</span>
-          </div>
-
-          <div class="member-actions" *ngIf="isAdmin() && member.role !== 'Admin'">
-            <button (click)="transferRole(member.userId, member.name || member.Name)" class="btn-primary-sm">Nommer Admin</button>
-            <button (click)="removeMember(member.userId, member.name || member.Name)" class="btn-danger-sm">Retirer</button>
-          </div>
-
-        </li>
-      </ul>
-
-      <div class="danger-zone" *ngIf="isAdmin()">
-        <h3>Zone de danger</h3>
-        <p>La suppression du groupe entraînera la perte de tous les messages et événements liés. Cette action est irréversible.</p>
-        <button (click)="deleteGroup()" class="btn-danger">Supprimer le groupe</button>
-      </div>
-    </div>
-
-  </section>
-
-  <div class="modal-overlay" *ngIf="showInviteModal()" (click)="closeInviteModal()">
-    <div class="card modal-box" (click)="$event.stopPropagation()">
-
-      <div class="modal-header">
-        <h2>Ajouter un membre</h2>
-      </div>
-
-      <div class="modal-body">
-        <div class="input-group">
-          <label>Nom, prénom ou email</label>
-          <div class="search-row">
-            <input type="text" class="custom-input" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
-              (keyup.enter)="searchUsers()" placeholder="Ex: Jean Dupont">
-            <button class="btn-primary" (click)="searchUsers()">Chercher</button>
+          <div class="chat-input-row">
+            <input type="text" class="custom-input" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()"
+              placeholder="Écrivez un message...">
+            <button class="btn-primary" (click)="sendMessage()"><i class="fas fa-paper-plane"></i></button>
           </div>
         </div>
+      }
 
-        <p *ngIf="isSearching()" class="search-status">Recherche en cours...</p>
-        <p *ngIf="!isSearching() && searchResults().length === 0 && searchQuery()" class="search-error">
-          Aucun utilisateur trouvé.
-        </p>
+      @if (activeTab() === 'randomizer') {
+        <div class="card randomizer-section">
+          <div class="secret-santa-wrapper">
+            <h2 class="santa-title">🎁 Secret Santa {{ currentUser?.year || '' }}</h2>
 
-        <div class="results-list" *ngIf="searchResults().length > 0">
-          <div *ngFor="let user of searchResults()" class="result-item">
-            
-            <div class="user-info-row">
-              <img [src]="user.profilePictureUrl || user.ProfilePictureUrl ? 'https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net' + (user.profilePictureUrl || user.ProfilePictureUrl) : 'assets/default-avatar.png'"
-                alt="Avatar" class="user-avatar" onerror="this.style.display='none'">
-              <div class="user-text">
-                <span class="user-name">{{ user.name || user.Name }}</span>
-                <span class="user-email">{{ user.email || user.Email }}</span>
+            @if (!secretSantaState().isDrawn) {
+              <div class="no-draw">
+                <div class="santa-icon">🎲</div>
+                <p class="santa-desc">Aucun tirage n'a encore été effectué pour cette année.</p>
+
+                @if (isAdmin()) {
+                  <button class="btn-santa-action" (click)="triggerSecretSanta()">
+                    Lancer le tirage au sort !
+                  </button>
+                } @else {
+                  <p class="santa-wait">⏳ Attendez que l'administrateur lance le tirage.</p>
+                }
+              </div>
+            }
+
+            @if (secretSantaState().isDrawn && !secretSantaState().isRevealed) {
+              <div class="hidden-target">
+                <div class="santa-icon animated-bounce">📦</div>
+                <h3>Le tirage a eu lieu !</h3>
+                <p class="santa-desc">Votre cible vous attend sagement dans cette boîte virtuelle.</p>
+                <button class="btn-santa-reveal" (click)="revealTarget()">
+                  🎁 Révéler ma cible
+                </button>
+              </div>
+            }
+
+            @if (secretSantaState().isDrawn && secretSantaState().isRevealed) {
+              <div class="target-reveal">
+                <h3>🎉 Vous êtes le Secret Santa de :</h3>
+                <div class="target-card">
+                  <img [src]="secretSantaState().targetPicture ? 'https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net' + secretSantaState().targetPicture : 'assets/default-avatar.png'"
+                    alt="Avatar Cible" class="target-avatar" onerror="this.src='FamHubIcon.png'">
+                  <span class="target-name">{{ secretSantaState().targetName }}</span>
+                </div>
+                <p class="santa-secret-text">Chut ! C'est un secret. Ne le dites à personne ! 🤫</p>
+              </div>
+            }
+
+            @if (isAdmin() && secretSantaState().isDrawn) {
+              <div class="santa-admin-zone">
+                <button class="btn-danger-outline" (click)="resetSecretSanta()">
+                  🔄 Réinitialiser le tirage
+                </button>
+                <p class="admin-note">(Action Admin : annule le tirage pour tout le monde)</p>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (activeTab() === 'calendar') {
+        <div class="card calendar-container">
+          <app-calendar [groupId]="groupId"></app-calendar>
+        </div>
+      }
+
+      @if (activeTab() === 'settings') {
+        <div class="card settings-section">
+          <h3 class="section-title">Membres du groupe</h3>
+          <ul class="member-list">
+            @for (member of members(); track member.userId) {
+              <li class="member-item">
+                <div class="member-info">
+                  <strong>{{ member.name || member.Name }}</strong>
+                  @if (member.role === 'Admin') {
+                    <span class="badge-admin">👑 Admin</span>
+                  }
+                </div>
+                @if (isAdmin() && member.role !== 'Admin') {
+                  <div class="member-actions">
+                    <button (click)="transferRole(member.userId, member.name || member.Name)" class="btn-primary-sm">Nommer Admin</button>
+                    <button (click)="removeMember(member.userId, member.name || member.Name)" class="btn-danger-sm">Retirer</button>
+                  </div>
+                }
+              </li>
+            }
+          </ul>
+
+          @if (isAdmin()) {
+            <div class="danger-zone">
+              <h3>Zone de danger</h3>
+              <p>La suppression du groupe entraînera la perte de tous les messages et événements liés.</p>
+              <button (click)="deleteGroup()" class="btn-danger">Supprimer le groupe</button>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    @if (showInviteModal()) {
+      <div class="modal-overlay" (click)="closeInviteModal()">
+        <div class="card modal-box" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>Ajouter un membre</h2>
+          </div>
+          <div class="modal-body">
+            <div class="input-group">
+              <label>Nom, prénom ou email</label>
+              <div class="search-row">
+                <input type="text" class="custom-input" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+                  (keyup.enter)="searchUsers()" placeholder="Ex: Jean Dupont">
+                <button class="btn-primary" (click)="searchUsers()">Chercher</button>
               </div>
             </div>
-            <button (click)="inviteUser(user)" class="btn-primary-sm">Ajouter</button>
-            
+
+            @if (isSearching()) {
+              <p class="search-status">Recherche en cours...</p>
+            }
+
+            @if (!isSearching() && searchResults().length === 0 && searchQuery()) {
+              <p class="search-error">Aucun utilisateur trouvé.</p>
+            }
+
+            @if (searchResults().length > 0) {
+              <div class="results-list">
+                @for (user of searchResults(); track user.email || user.Email) {
+                  <div class="result-item">
+                    <div class="user-info-row">
+                      <img [src]="user.profilePictureUrl || user.ProfilePictureUrl ? 'https://famillyhub-arbzdag7axfpabb8.belgiumcentral-01.azurewebsites.net' + (user.profilePictureUrl || user.ProfilePictureUrl) : 'assets/default-avatar.png'"
+                        alt="Avatar" class="user-avatar" onerror="this.style.display='none'">
+                      <div class="user-text">
+                        <span class="user-name">{{ user.name || user.Name }}</span>
+                        <span class="user-email">{{ user.email || user.Email }}</span>
+                      </div>
+                    </div>
+                    <button (click)="inviteUser(user)" class="btn-primary-sm">Ajouter</button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+          <div class="modal-footer">
+            <button class="btn-cancel" (click)="closeInviteModal()">Fermer</button>
           </div>
         </div>
       </div>
-
-      <div class="modal-footer">
-        <div></div>
-        <div class="right-actions">
-          <button class="btn-cancel" (click)="closeInviteModal()">Fermer</button>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
+    }
+  }
 </div>

@@ -1,30 +1,34 @@
 <div class="calendar-wrapper">
   
-  <header class="page-header" *ngIf="!groupId()">
-    <h1>Planning & Dispos</h1>
-  </header>
+  @if (!groupId()) {
+    <header class="page-header">
+      <h1>Planning & Dispos</h1>
+    </header>
+  }
 
   <section class="calendar-layout" [class.full-width]="groupId()">
     
-    <aside class="card sidebar-config" *ngIf="!groupId()">
-      <div class="config-section">
-        <h3>Instructions</h3>
-        <p class="instruction-text">
-          Cliquez sur un créneau pour ajouter un événement.
-          Glissez pour définir la durée.
-        </p>
-      </div>
+    @if (!groupId()) {
+      <aside class="card sidebar-config">
+        <div class="config-section">
+          <h3>Instructions</h3>
+          <p class="instruction-text">
+            Cliquez sur un créneau pour ajouter un événement.
+            Glissez pour définir la durée.
+          </p>
+        </div>
 
-      <div class="config-section status-legend">
-        <h3>Légende</h3>
-        <ul>
-          <li><span class="badge blue"></span> Groupe (Partagé)</li>
-          <li><span class="badge green"></span> Perso (Disponible)</li>
-          <li><span class="badge yellow"></span> Perso (Privé)</li>
-          <li><span class="badge red"></span> Perso (Masqué)</li>
-        </ul>
-      </div>
-    </aside>
+        <div class="config-section status-legend">
+          <h3>Légende</h3>
+          <ul>
+            <li><span class="badge blue"></span> Groupe (Partagé)</li>
+            <li><span class="badge green"></span> Perso (Disponible)</li>
+            <li><span class="badge yellow"></span> Perso (Privé)</li>
+            <li><span class="badge red"></span> Perso (Masqué)</li>
+          </ul>
+        </div>
+      </aside>
+    }
 
     <div class="card calendar-card">
       <full-calendar [options]="calendarOptions"></full-calendar>
@@ -32,79 +36,90 @@
     
   </section>
 
-  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
-    
-    <div class="modal-box" (click)="$event.stopPropagation()">
+  @if (showModal) {
+    <div class="modal-overlay" (click)="closeModal()">
+      
+      <div class="modal-box" (click)="$event.stopPropagation()">
 
-      <div class="modal-header">
-        <h2>{{ isEditMode ? 'Modifier l\'événement' : 'Nouvel événement' }}</h2>
-      </div>
-
-      <div class="modal-body">
-        
-        <div class="input-group">
-          <label>Titre de l'événement</label>
-          <input type="text" class="custom-input" [(ngModel)]="tempEvent.title" placeholder="Ex: Repas de famille, Dentiste...">
+        <div class="modal-header">
+          <h2>{{ isEditMode ? 'Modifier l\'événement' : 'Nouvel événement' }}</h2>
         </div>
 
-        <div class="input-row">
-          <div class="input-group">
-            <label>Date et heure de début</label>
-            <input type="datetime-local" class="custom-input" [(ngModel)]="tempEvent.start">
-          </div>
-          <div class="input-group">
-            <label>Date et heure de fin</label>
-            <input type="datetime-local" class="custom-input" [(ngModel)]="tempEvent.end">
-          </div>
-        </div>
-
-        <div class="input-group" *ngIf="tempEvent.groupId === null">
-          <label>Confidentialité</label>
-          <div class="checkbox-row">
-            <label class="checkbox-label" title="Visible uniquement par moi">
-              <input type="checkbox" [(ngModel)]="tempEvent.isPrivate"> 
-              Privé
-            </label>
-            <label class="checkbox-label" title="Les autres verront 'Occupé'">
-              <input type="checkbox" [(ngModel)]="tempEvent.maskDetails" [disabled]="tempEvent.isPrivate"> 
-              Masquer détails
-            </label>
-          </div>
-        </div>
-
-        <div class="color-picker-group">
-          <label>Couleur</label>
+        <div class="modal-body">
           
-          <div class="color-presets" *ngIf="tempEvent.groupId === null">
-            <div class="color-swatch" [style.background-color]="'#3b82f6'" (click)="tempEvent.color = '#3b82f6'" [class.active]="tempEvent.color === '#3b82f6'"></div>
-            <div class="color-swatch" [style.background-color]="'#10b981'" (click)="tempEvent.color = '#10b981'" [class.active]="tempEvent.color === '#10b981'"></div>
-            <div class="color-swatch" [style.background-color]="'#f59e0b'" (click)="tempEvent.color = '#f59e0b'" [class.active]="tempEvent.color === '#f59e0b'"></div>
-            <div class="color-swatch" [style.background-color]="'#ef4444'" (click)="tempEvent.color = '#ef4444'" [class.active]="tempEvent.color === '#ef4444'"></div>
+          <div class="input-group">
+            <label>Titre de l'événement</label>
+            <input type="text" class="custom-input" [(ngModel)]="tempEvent.title" placeholder="Ex: Repas de famille, Dentiste...">
           </div>
 
-          <p *ngIf="tempEvent.groupId !== null" style="font-size:0.9rem; color:#64748b; margin-bottom:10px;">
-            Les événements de groupe utilisent la couleur du groupe.
-          </p>
+          <div class="input-row">
+            <div class="input-group">
+              <label>Date et heure de début</label>
+              <input type="datetime-local" class="custom-input" [(ngModel)]="tempEvent.start">
+            </div>
+            <div class="input-group">
+              <label>Date et heure de fin</label>
+              <input type="datetime-local" class="custom-input" [(ngModel)]="tempEvent.end">
+            </div>
+          </div>
 
-          <div class="custom-color-section">
-             <input type="color" class="rect-color-input" [(ngModel)]="tempEvent.color" [disabled]="tempEvent.groupId !== null">
+          @if (tempEvent.groupId === null) {
+            <div class="input-group">
+              <label>Confidentialité</label>
+              <div class="checkbox-row">
+                <label class="checkbox-label" title="Visible uniquement par moi">
+                  <input type="checkbox" [(ngModel)]="tempEvent.isPrivate"> 
+                  Privé
+                </label>
+                <label class="checkbox-label" title="Les autres verront 'Occupé'">
+                  <input type="checkbox" [(ngModel)]="tempEvent.maskDetails" [disabled]="tempEvent.isPrivate"> 
+                  Masquer détails
+                </label>
+              </div>
+            </div>
+          }
+
+          <div class="color-picker-group">
+            <label>Couleur</label>
+            
+            @if (tempEvent.groupId === null) {
+              <div class="color-presets">
+                <div class="color-swatch" [style.background-color]="'#3b82f6'" (click)="tempEvent.color = '#3b82f6'" [class.active]="tempEvent.color === '#3b82f6'"></div>
+                <div class="color-swatch" [style.background-color]="'#10b981'" (click)="tempEvent.color = '#10b981'" [class.active]="tempEvent.color === '#10b981'"></div>
+                <div class="color-swatch" [style.background-color]="'#f59e0b'" (click)="tempEvent.color = '#f59e0b'" [class.active]="tempEvent.color === '#f59e0b'"></div>
+                <div class="color-swatch" [style.background-color]="'#ef4444'" (click)="tempEvent.color = '#ef4444'" [class.active]="tempEvent.color === '#ef4444'"></div>
+              </div>
+            }
+
+            @if (tempEvent.groupId !== null) {
+              <p style="font-size:0.9rem; color:#64748b; margin-bottom:10px;">
+                Les événements de groupe utilisent la couleur du groupe.
+              </p>
+            }
+
+            <div class="custom-color-section">
+               <input type="color" class="rect-color-input" [(ngModel)]="tempEvent.color" [disabled]="tempEvent.groupId !== null">
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          @if (isEditMode) {
+            <button class="btn-danger" (click)="deleteEvent()">Supprimer</button>
+          } @else {
+            <div></div> 
+          }
+          
+          <div class="right-actions">
+            <button class="btn-cancel" (click)="closeModal()">Annuler</button>
+            <button class="btn-primary" (click)="saveEvent()">
+              {{ isEditMode ? 'Mettre à jour' : 'Enregistrer' }}
+            </button>
           </div>
         </div>
 
       </div>
-
-      <div class="modal-footer">
-        <button *ngIf="isEditMode" class="btn-danger" (click)="deleteEvent()">Supprimer</button>
-        <div *ngIf="!isEditMode"></div> 
-        
-        <div class="right-actions">
-          <button class="btn-cancel" (click)="closeModal()">Annuler</button>
-          <button class="btn-primary" (click)="saveEvent()">
-            {{ isEditMode ? 'Mettre à jour' : 'Enregistrer' }}
-          </button>
-        </div>
-      </div>
-
     </div>
-  </div>
+  }
 </div>

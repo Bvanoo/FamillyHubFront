@@ -5,7 +5,6 @@ import { loginGuard } from './guard/login-guard';
 import { Login } from './login/login';
 import { Signup } from './signup/signup';
 import { Nouveaumdp } from './nouveaumdp/nouveaumdp';
-// import { Messenger } from './messenger/messenger';
 import { Groupes } from './groupes/groupes';
 import { Randomizer } from './randomizer/randomizer';
 import { Profil } from './profil/profil';

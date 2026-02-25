@@ -16,19 +16,27 @@
           <input type="email" formControlName="email" placeholder="exemple@mail.com">
         </div>
         
-        <div *ngIf="forgotPasswordForm.get('email')?.touched && forgotPasswordForm.get('email')?.invalid" class="error-message">
-          <small *ngIf="forgotPasswordForm.get('email')?.hasError('required')">L'email est requis.</small>
-          <small *ngIf="forgotPasswordForm.get('email')?.hasError('email')">Format invalide.</small>
-        </div>
+        @if (forgotPasswordForm.get('email')?.touched && forgotPasswordForm.get('email')?.invalid) {
+          <div class="error-message">
+            @if (forgotPasswordForm.get('email')?.hasError('required')) {
+              <small>L'email est requis.</small>
+            }
+            @if (forgotPasswordForm.get('email')?.hasError('email')) {
+              <small>Format invalide.</small>
+            }
+          </div>
+        }
       </div>
 
       <button type="submit" class="btn-auth" [disabled]="forgotPasswordForm.invalid">Envoyer le lien</button>
       
     </form>
     
-    <div *ngIf="message" class="success-message">
-      <i class="fas fa-check-circle"></i> {{ message }}
-    </div>
+    @if (message) {
+      <div class="success-message">
+        <i class="fas fa-check-circle"></i> {{ message }}
+      </div>
+    }
 
     <div class="auth-footer">
       <a (click)="_nav.goToLogin()"><i class="fas fa-arrow-left"></i> Retour à la connexion</a>

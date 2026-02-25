@@ -15,10 +15,16 @@
           <i class="fas fa-envelope"></i>
           <input type="email" id="email" formControlName="email" placeholder="papa@exemple.com">
         </div>
-        <div *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid" class="error-message">
-          <small *ngIf="loginForm.get('email')?.hasError('required')">L'email est requis.</small>
-          <small *ngIf="loginForm.get('email')?.hasError('email')">Format invalide.</small>
-        </div>
+        @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
+          <div class="error-message">
+            @if (loginForm.get('email')?.hasError('required')) {
+              <small>L'email est requis.</small>
+            }
+            @if (loginForm.get('email')?.hasError('email')) {
+              <small>Format invalide.</small>
+            }
+          </div>
+        }
       </div>
 
       <div class="form-group">
@@ -27,9 +33,11 @@
           <i class="fas fa-lock"></i>
           <input type="password" id="password" formControlName="password" placeholder="••••••••">
         </div>
-        <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="error-message">
-          <small *ngIf="loginForm.get('password')?.hasError('required')">Le mot de passe est requis.</small>
-        </div>
+        @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
+          <div class="error-message">
+            <small>Le mot de passe est requis.</small>
+          </div>
+        }
       </div>
 
       <div class="form-options">
