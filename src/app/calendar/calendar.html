@@ -29,23 +29,22 @@
     <div class="card calendar-card">
       <full-calendar [options]="calendarOptions"></full-calendar>
     </div>
+    
   </section>
 
   <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
-     </div>
-</div>
-    <div class="card modal-box" (click)="$event.stopPropagation()">
+    
+    <div class="modal-box" (click)="$event.stopPropagation()">
 
       <div class="modal-header">
         <h2>{{ isEditMode ? 'Modifier l\'événement' : 'Nouvel événement' }}</h2>
       </div>
 
       <div class="modal-body">
-
+        
         <div class="input-group">
           <label>Titre de l'événement</label>
-          <input type="text" class="custom-input" [(ngModel)]="tempEvent.title"
-            placeholder="Ex: Repas de famille, Dentiste...">
+          <input type="text" class="custom-input" [(ngModel)]="tempEvent.title" placeholder="Ex: Repas de famille, Dentiste...">
         </div>
 
         <div class="input-row">
@@ -63,11 +62,11 @@
           <label>Confidentialité</label>
           <div class="checkbox-row">
             <label class="checkbox-label" title="Visible uniquement par moi">
-              <input type="checkbox" [(ngModel)]="tempEvent.isPrivate">
+              <input type="checkbox" [(ngModel)]="tempEvent.isPrivate"> 
               Privé
             </label>
             <label class="checkbox-label" title="Les autres verront 'Occupé'">
-              <input type="checkbox" [(ngModel)]="tempEvent.maskDetails" [disabled]="tempEvent.isPrivate">
+              <input type="checkbox" [(ngModel)]="tempEvent.maskDetails" [disabled]="tempEvent.isPrivate"> 
               Masquer détails
             </label>
           </div>
@@ -75,16 +74,12 @@
 
         <div class="color-picker-group">
           <label>Couleur</label>
-
+          
           <div class="color-presets" *ngIf="tempEvent.groupId === null">
-            <div class="color-swatch" [style.background-color]="'#3b82f6'" (click)="tempEvent.color = '#3b82f6'"
-              [class.active]="tempEvent.color === '#3b82f6'"></div>
-            <div class="color-swatch" [style.background-color]="'#10b981'" (click)="tempEvent.color = '#10b981'"
-              [class.active]="tempEvent.color === '#10b981'"></div>
-            <div class="color-swatch" [style.background-color]="'#f59e0b'" (click)="tempEvent.color = '#f59e0b'"
-              [class.active]="tempEvent.color === '#f59e0b'"></div>
-            <div class="color-swatch" [style.background-color]="'#ef4444'" (click)="tempEvent.color = '#ef4444'"
-              [class.active]="tempEvent.color === '#ef4444'"></div>
+            <div class="color-swatch" [style.background-color]="'#3b82f6'" (click)="tempEvent.color = '#3b82f6'" [class.active]="tempEvent.color === '#3b82f6'"></div>
+            <div class="color-swatch" [style.background-color]="'#10b981'" (click)="tempEvent.color = '#10b981'" [class.active]="tempEvent.color === '#10b981'"></div>
+            <div class="color-swatch" [style.background-color]="'#f59e0b'" (click)="tempEvent.color = '#f59e0b'" [class.active]="tempEvent.color === '#f59e0b'"></div>
+            <div class="color-swatch" [style.background-color]="'#ef4444'" (click)="tempEvent.color = '#ef4444'" [class.active]="tempEvent.color === '#ef4444'"></div>
           </div>
 
           <p *ngIf="tempEvent.groupId !== null" style="font-size:0.9rem; color:#64748b; margin-bottom:10px;">
@@ -92,8 +87,7 @@
           </p>
 
           <div class="custom-color-section">
-            <input type="color" class="rect-color-input" [(ngModel)]="tempEvent.color"
-              [disabled]="tempEvent.groupId !== null">
+             <input type="color" class="rect-color-input" [(ngModel)]="tempEvent.color" [disabled]="tempEvent.groupId !== null">
           </div>
         </div>
 
@@ -101,7 +95,8 @@
 
       <div class="modal-footer">
         <button *ngIf="isEditMode" class="btn-danger" (click)="deleteEvent()">Supprimer</button>
-        <div *ngIf="!isEditMode"></div>
+        <div *ngIf="!isEditMode"></div> 
+        
         <div class="right-actions">
           <button class="btn-cancel" (click)="closeModal()">Annuler</button>
           <button class="btn-primary" (click)="saveEvent()">
@@ -111,3 +106,5 @@
       </div>
 
     </div>
+  </div>
+</div>

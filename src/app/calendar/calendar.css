@@ -12,7 +12,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 24px 0px;
+    margin-bottom: 20px;
 }
 
 .page-header h1 {
@@ -152,29 +152,13 @@
     color: #334155;
 }
 
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(4px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    animation: fadeIn 0.2s ease;
-    padding: 20px;
-    box-sizing: border-box;
-}
 
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(4px);
     display: flex;
@@ -189,23 +173,27 @@
 .modal-box {
     width: 100%;
     max-width: 500px;
-    padding: 0;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     display: flex;
     flex-direction: column;
     animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    max-height: 100%;
+    max-height: 90vh;
     overflow: hidden;
+    margin: auto;
 }
 
 .modal-header {
     padding: 20px;
     border-bottom: 1px solid #f1f5f9;
     flex-shrink: 0;
+    background: white;
 }
 
 .modal-header h2 {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     color: #0f172a;
 }
 
@@ -215,6 +203,7 @@
     flex-direction: column;
     gap: 20px;
     overflow-y: auto;
+    background: white;
 }
 
 .modal-footer {
@@ -226,8 +215,6 @@
     flex-wrap: wrap;
     gap: 10px;
     flex-shrink: 0;
-    border-bottom-left-radius: inherit;
-    border-bottom-right-radius: inherit;
 }
 
 .right-actions {
@@ -243,6 +230,7 @@
         width: auto;
     }
 }
+
 
 .input-group label {
     display: block;
@@ -349,6 +337,10 @@
     background: none;
 }
 
+
+/* =========================================
+   --- RESPONSIVE DESKTOP --- 
+========================================= */
 @media (min-width: 1024px) {
     .calendar-layout {
         grid-template-columns: 280px 1fr;
