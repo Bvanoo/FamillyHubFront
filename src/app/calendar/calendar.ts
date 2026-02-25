@@ -11,6 +11,7 @@ import { CalendarService } from '../Services/calendar-service';
 import { GroupService } from '../Services/group-service';
 import { AuthService } from '../Services/auth-service';
 import { CalendarEvent } from '../models/interfaces';
+import { Navigation } from '../Services/navigation';
 
 @Component({
   selector: 'app-calendar',
@@ -25,6 +26,7 @@ export class Calendar implements OnInit {
   private readonly _groupService = inject(GroupService);
   private readonly _authService = inject(AuthService);
   private readonly _cdr = inject(ChangeDetectorRef);
+  private readonly _nav = inject(Navigation)
 
   showModal = false;
   isEditMode = false;
@@ -47,8 +49,8 @@ export class Calendar implements OnInit {
 
   calendarOptions: CalendarOptions = {
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-    initialView: 'timeGridWeek',
     locale: frLocale,
+    timeZone: 'local', // S'assure que le calendrier utilise le fuseau local (Belgique)
     slotDuration: '01:00:00',
     selectable: true,
     height: 'auto',
@@ -97,8 +99,8 @@ export class Calendar implements OnInit {
     };
   }
 
-loadUnifiedEvents() {
-  const currentGroupId = this.groupId();
+  loadUnifiedEvents() {
+    const currentGroupId = this.groupId();
     const request$ = currentGroupId
       ? this._calendarService.getGroupEvents(currentGroupId) 
       : this._calendarService.getUnifiedEvents();
@@ -118,7 +120,7 @@ loadUnifiedEvents() {
 
           let picUrl = e.userPicture || e.UserPicture;
           if (picUrl && !picUrl.startsWith('http')) {
-            picUrl = `https://localhost:7075${picUrl}`;
+            picUrl = `${this._nav.baseUrlProd}${picUrl}`;
           }
 
           return {
@@ -157,11 +159,20 @@ loadUnifiedEvents() {
     });
   }
 
+  private formatForInput(dateStr: string, isAllDay: boolean, isEnd: boolean = false): string {
+    if (isAllDay || dateStr.length <= 10) {
+      const datePart = dateStr.substring(0, 10);
+      return isEnd ? `${datePart}T09:00` : `${datePart}T08:00`;
+    }
+    return dateStr.substring(0, 16);
+  }
+
   handleSelect(selectInfo: DateSelectArg) {
     this.isEditMode = false;
     this.resetTempEvent();
-    this.tempEvent.start = selectInfo.startStr;
-    this.tempEvent.end = selectInfo.endStr;
+    this.tempEvent.start = this.formatForInput(selectInfo.startStr, selectInfo.allDay);
+    this.tempEvent.end = this.formatForInput(selectInfo.endStr, selectInfo.allDay, true);
+    
     this.openModal();
     selectInfo.view.calendar.unselect();
   }
@@ -182,8 +193,10 @@ loadUnifiedEvents() {
       userId: eventOwnerId || this.userId,
       title: props['realTitle'],
       description: props['realDescription'],
-      start: clickInfo.event.startStr,
-      end: clickInfo.event.endStr,
+      start: this.formatForInput(clickInfo.event.startStr, clickInfo.event.allDay),
+      end: clickInfo.event.endStr 
+        ? this.formatForInput(clickInfo.event.endStr, clickInfo.event.allDay, true) 
+        : this.formatForInput(clickInfo.event.startStr, clickInfo.event.allDay),
       color: clickInfo.event.backgroundColor,
       type: props['type'] || 'Disponible',
       isPrivate: isPrivate || false,
@@ -206,6 +219,8 @@ loadUnifiedEvents() {
       id: this.selectedEventId ?? undefined,
       userId: this.userId,
       title: safeTitle,
+      start: new Date(this.tempEvent.start).toISOString(),
+      end: new Date(this.tempEvent.end).toISOString(),
       color: this.tempEvent.groupId ? '#3b82f6' : this.tempEvent.color,
     };
 

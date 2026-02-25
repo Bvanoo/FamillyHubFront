@@ -1,16 +1,14 @@
-<div class="login-container">
-  <div class="login-card">
+<div class="auth-container">
+  <div class="auth-card">
 
-    <div class="login-header">
-      <div class="logo-circle">
-        <img src="FamHubIcon.png" alt="Logo">
-      </div>
+    <div class="auth-header">
+      <img src="FamHubIcon.png" alt="Logo" class="auth-logo" onerror="this.style.display='none'">
+      <h1>Mot de passe <span>oublié</span></h1>
+      <p>Entrez votre email pour recevoir un lien.</p>
     </div>
 
-    <h1>Mot de passe <span>oublié</span></h1>
-    <p>Entrez votre email pour recevoir un lien.</p>
-
-    <form [formGroup]="forgotPasswordForm" (ngSubmit)="onSubmit()">
+    <form class="auth-form" [formGroup]="forgotPasswordForm" (ngSubmit)="onSubmit()">
+      
       <div class="form-group">
         <label>Email</label>
         <div class="input-wrapper">
@@ -20,19 +18,20 @@
         
         <div *ngIf="forgotPasswordForm.get('email')?.touched && forgotPasswordForm.get('email')?.invalid" class="error-message">
           <small *ngIf="forgotPasswordForm.get('email')?.hasError('required')">L'email est requis.</small>
-          <small *ngIf="forgotPasswordForm.get('email')?.hasError('email')">Le format de l'email est invalide.</small>
+          <small *ngIf="forgotPasswordForm.get('email')?.hasError('email')">Format invalide.</small>
         </div>
       </div>
 
-      <button type="submit" class="btn-login" [disabled]="forgotPasswordForm.invalid">Envoyer</button>
+      <button type="submit" class="btn-auth" [disabled]="forgotPasswordForm.invalid">Envoyer le lien</button>
+      
     </form>
     
-    <p *ngIf="message" style="color: green; margin-top: 10px; font-weight: bold; text-align: center;">
-      {{ message }}
-    </p>
+    <div *ngIf="message" class="success-message">
+      <i class="fas fa-check-circle"></i> {{ message }}
+    </div>
 
-    <div class="login-footer">
-      <a (click)="_nav.goToLogin()" style="cursor: pointer;">Retour à la connexion</a>
+    <div class="auth-footer">
+      <a (click)="_nav.goToLogin()"><i class="fas fa-arrow-left"></i> Retour à la connexion</a>
     </div>
     
   </div>

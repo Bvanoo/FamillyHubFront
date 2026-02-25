@@ -1,5 +1,9 @@
-<app-banner [ngClass]="{ 'disable': hasRoute('/login') || hasRoute('/signup') || hasRoute('/nouveaumdp') }"></app-banner>
-
-<div class="main-wrapper" [ngClass]="{ 'no-padding': hasRoute('/login') || hasRoute('/signup') || hasRoute('/nouveaumdp') }">
-    <router-outlet></router-outlet>
+<div class="app-container">
+    <app-banner [ngClass]="{ 'disable': hasRoute('/login') || hasRoute('/signup') || hasRoute('/nouveaumdp') }"></app-banner>
+    
+    <main class="main-content-wrapper" [ngClass]="{ 'no-padding': hasRoute('/login') || hasRoute('/signup') || hasRoute('/nouveaumdp') }">
+        <div class="main-content-inner">
+            <router-outlet></router-outlet>
+        </div>
+    </main>
 </div>

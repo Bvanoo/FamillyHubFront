@@ -1,11 +1,15 @@
 <button class="burger-btn" (click)="toggleMenu()" aria-label="Menu">
-    <i class="fas fa-bars" *ngIf="!isMenuOpen()"></i>
-    <i class="fas fa-times" *ngIf="isMenuOpen()"></i>
+    <i class="fas fa-bars"></i>
 </button>
 
 <div class="sidebar-overlay" *ngIf="isMenuOpen()" (click)="closeMenu()"></div>
 
 <nav class="sidebar" [class.open]="isMenuOpen()">
+    
+    <button class="close-btn" (click)="closeMenu()">
+        <i class="fas fa-times"></i>
+    </button>
+
     <div class="sidebar-header">
         <img src="FamHubIcon.png" alt="FamillyHub Logo" class="logo">
         <span class="brand-name">FamillyHub</span>

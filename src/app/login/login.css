@@ -1,5 +1,6 @@
-.login-container {
-    min-height: 100vh;
+.auth-container {
+    height: 100%;
+    min-height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -7,159 +8,203 @@
     padding: 20px;
 }
 
-
-.login-card {
+.auth-card {
     background: var(--white);
     width: 100%;
     max-width: 450px;
-    padding: 50px 40px;
-    border-radius: 40px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    padding: 30px 20px;
+    border-radius: 24px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-header {
     text-align: center;
-    animation: slideUp 0.6s ease-out;
+    margin-bottom: 30px;
 }
 
-img {
-    width: 100px;
-    transform: rotate(-140deg);
+.auth-logo {
+    width: 80px;
+    margin-bottom: 15px;
+    transform: rotate(-15deg);
+    transition: transform 0.3s ease;
 }
-.login-header {
-    margin-bottom: 40px;
 
+.auth-card:hover .auth-logo {
+    transform: rotate(0deg) scale(1.05);
+}
 
-    h1 {
-        font-weight: 800;
-        color: var(--text-dark);
-        font-size: 2rem;
+.auth-header h1 {
+    font-weight: 800;
+    color: var(--text-dark);
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}
 
-        span {
-            color: var(--primary-color);
-        }
-    }
+.auth-header h1 span {
+    color: var(--primary-color);
+}
 
-    p {
-        color: var(--text-muted);
-        font-weight: 500;
-    }
+.auth-header p {
+    color: #64748b;
+    font-size: 0.95rem;
+    font-weight: 500;
 }
 
 .form-group {
-    text-align: left;
     margin-bottom: 20px;
+}
 
-    label {
-        display: block;
-        font-weight: 700;
-        margin-bottom: 8px;
-        margin-left: 5px;
-        font-size: 0.9rem;
-    }
+.form-group label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #334155;
+    font-size: 0.9rem;
+}
 
-    .input-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
 
-        i {
-            position: absolute;
-            left: 15px;
-            color: var(--primary-color);
-        }
+.input-wrapper i {
+    position: absolute;
+    left: 16px;
+    color: #94a3b8;
+    transition: color 0.3s;
+}
 
-        input {
-            width: 100%;
-            padding: 15px 15px 15px 45px;
-            border-radius: 18px;
-            border: 2px solid #f0f0f0;
-            background: #f9f9f9;
-            font-family: inherit;
-            font-weight: 500;
-            transition: all 0.3s;
+.input-wrapper input {
+    width: 100%;
+    padding: 14px 14px 14px 45px;
+    border-radius: 14px;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+    font-family: inherit;
+    font-size: 1rem;
+    color: #1e293b;
+    transition: all 0.3s;
+    box-sizing: border-box;
+}
 
-            &:focus {
-                outline: none;
-                border-color: var(--primary-color);
-                background: white;
-                box-shadow: 0 5px 15px rgba(17, 126, 189, 0.1);
-            }
-        }
-    }
+.input-wrapper input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(17, 126, 189, 0.1);
+}
+
+.input-wrapper input:focus+i,
+.input-wrapper input:not(:placeholder-shown)~i {
+    color: var(--primary-color);
 }
 
 .form-options {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 24px;
     font-size: 0.85rem;
     font-weight: 600;
-
-    .forgot-link {
-        color: var(--primary-color);
-        text-decoration: none;
-    }
 }
 
-.btn-login {
-    width: 100%;
-    padding: 16px;
-    border-radius: 20px;
-    border: none;
-    background: var(--active-gradient);
-    color: white;
-    font-size: 1.1rem;
-    font-weight: 700;
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #475569;
     cursor: pointer;
-    box-shadow: 0 10px 20px rgba(17, 126, 189, 0.2);
-    transition: all 0.3s;
-
-    &:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 25px rgba(17, 126, 189, 0.3);
-    }
 }
 
-.login-footer {
-    margin-top: 30px;
-    font-size: 0.9rem;
-    font-weight: 500;
+.remember-me input {
+    accent-color: var(--primary-color);
+    width: 16px;
+    height: 16px;
+}
 
-    a {
-        color: var(--primary-color);
-        font-weight: 700;
-        text-decoration: none;
+.forgot-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    cursor: pointer;
+}
 
-        &:hover {
-            text-decoration: underline;
-        }
-    }
+.forgot-link:hover {
+    text-decoration: underline;
 }
 
 .error-message {
-  color: #ff4d4f;
-  font-size: 0.8rem;
-  margin-top: 4px;
-  text-align: left;
-  display: block;
+    color: #ef4444;
+    font-size: 0.8rem;
+    margin-top: 6px;
+    font-weight: 500;
 }
 
-.btn-login:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-#google-btn {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
+.btn-auth {
     width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    background: var(--primary-color);
+    color: white;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(17, 126, 189, 0.2);
+    transition: background 0.2s, transform 0.1s;
+}
+
+.btn-auth:hover:not(:disabled) {
+    background: #0e6aa1;
+}
+
+.btn-auth:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.btn-auth:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.auth-footer {
+    margin-top: 24px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    color: #475569;
+}
+
+.auth-footer a {
+    color: var(--primary-color);
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+@media (min-width: 640px) {
+    .auth-card {
+        padding: 40px;
+        border-radius: 30px;
+    }
+
+    .auth-header h1 {
+        font-size: 2rem;
+    }
 }
 
 @keyframes slideUp {
     from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(20px);
     }
 
     to {

@@ -1,9 +1,13 @@
-<div class="login-container"> 
-  <div class="login-card">
-    <h1>Rejoindre la <span>Famille</span></h1>
-    <p>Créez votre espace FamilyHub</p>
+<div class="auth-container"> 
+  <div class="auth-card">
     
-    <form class="login-form" [formGroup]="signupForm" (ngSubmit)="onSignup()">
+    <div class="auth-header">
+      <img src="FamHubIcon.png" alt="Logo" class="auth-logo" onerror="this.style.display='none'">
+      <h1>Rejoindre la <span>Famille</span></h1>
+      <p>Créez votre espace FamilyHub</p>
+    </div>
+    
+    <form class="auth-form" [formGroup]="signupForm" (ngSubmit)="onSignup()">
       
       <div class="form-group">
         <label>Nom / Prénom</label>
@@ -13,7 +17,7 @@
         </div>
         <div *ngIf="signupForm.get('name')?.touched && signupForm.get('name')?.invalid" class="error-message">
           <small *ngIf="signupForm.get('name')?.hasError('required')">Le nom est requis.</small>
-          <small *ngIf="signupForm.get('name')?.hasError('minlength')">Le nom doit faire au moins 2 caractères.</small>
+          <small *ngIf="signupForm.get('name')?.hasError('minlength')">Minimum 2 caractères.</small>
         </div>
       </div>
       
@@ -25,7 +29,7 @@
         </div>
         <div *ngIf="signupForm.get('email')?.touched && signupForm.get('email')?.invalid" class="error-message">
           <small *ngIf="signupForm.get('email')?.hasError('required')">L'email est requis.</small>
-          <small *ngIf="signupForm.get('email')?.hasError('email')">Le format de l'email est invalide.</small>
+          <small *ngIf="signupForm.get('email')?.hasError('email')">Format invalide.</small>
         </div>
       </div>
 
@@ -36,8 +40,8 @@
           <input type="password" formControlName="password" placeholder="••••••••">
         </div>
         <div *ngIf="signupForm.get('password')?.touched && signupForm.get('password')?.invalid" class="error-message">
-          <small *ngIf="signupForm.get('password')?.hasError('required')">Le mot de passe est requis.</small>
-          <small *ngIf="signupForm.get('password')?.hasError('minlength')">Le mot de passe doit contenir au moins 8 caractères.</small>
+          <small *ngIf="signupForm.get('password')?.hasError('required')">Mot de passe requis.</small>
+          <small *ngIf="signupForm.get('password')?.hasError('minlength')">Minimum 8 caractères.</small>
         </div>
       </div>
 
@@ -52,11 +56,13 @@
         </div>
       </div>
 
-      <button type="submit" class="btn-login" [disabled]="signupForm.invalid">S'inscrire</button>
+      <button type="submit" class="btn-auth" [disabled]="signupForm.invalid">S'inscrire</button>
+      
     </form>
     
-    <div class="login-footer">
+    <div class="auth-footer">
       <p>Déjà un compte ? <a (click)="_nav.goToLogin()">Se connecter</a></p>
     </div>
+    
   </div>
 </div>

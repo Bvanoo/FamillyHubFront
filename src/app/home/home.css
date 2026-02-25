@@ -1,40 +1,30 @@
 .home-container {
-  padding: 0 20px 20px 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding-bottom: 20px; 
 }
 
 h2 {
   color: #1f2937;
-  margin-bottom: 24px;
-  font-size: 1.5rem;
+  margin-bottom: 20px;
+  font-size: 1.3rem;
 }
 
 .events-grid {
   display: grid;
-  /* MAGIE SANS MEDIA QUERY :
-   - min(100%, 320px) : Prend 100% de la largeur sur les très petits écrans (< 320px), sinon 320px minimum.
-   - auto-fill : Ajoute autant de colonnes que possible dans l'espace disponible.
-   - 1fr : Partage l'espace restant équitablement.
-  */
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
-  gap: 20px;
+  grid-template-columns: 1fr;
+  gap: 16px;
 }
 
 .event-card {
   background: white;
   border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.05);
-  cursor: pointer;
+  padding: 16px;
   border-left: 6px solid #3b82f6;
   display: flex;
   flex-direction: column;
-  /* Transition douce sur l'ombre et la bordure */
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+  transition: box-shadow 0.3s ease;
 }
 
-/* Équivalent de group-hover pour la carte */
 .event-card:hover {
   box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
@@ -43,22 +33,20 @@ h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 16px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
   border-bottom: 1px solid #f3f4f6;
-  flex-wrap: wrap; /* Sécurité si le nom est très long sur petit écran */
-  gap: 10px;
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .profile-pic {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #e5e7eb;
@@ -67,57 +55,42 @@ h2 {
 .user-name {
   font-weight: 700;
   color: #374151;
-  font-size: 0.95rem;
-  /* Troncature si le nom est trop long */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 150px; 
+  font-size: 0.9rem;
 }
 
 .badge {
-  padding: 6px 14px;
+  padding: 4px 12px;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  white-space: nowrap;
 }
 
-.perso-badge {
-  background-color: #e0e7ff;
-  color: #4f46e5;
-}
-
-.group-badge {
-  background-color: #dcfce7;
-  color: #16a34a;
-}
+.perso-badge { background-color: #e0e7ff; color: #4f46e5; }
+.group-badge { background-color: #dcfce7; color: #16a34a; }
 
 .event-title {
   margin: 0 0 8px 0;
-  font-size: 1.2rem;
-  color: #111827;
+  font-size: 1.1rem;
   font-weight: 700;
   transition: color 0.2s ease;
 }
 
-/* Effet group-hover : Le titre change de couleur quand on survole la carte entière */
 .event-card:hover .event-title {
   color: var(--primary-color);
 }
 
 .event-date {
-  margin: 0 0 12px 0;
-  font-size: 0.9rem;
+  margin: 0 0 10px 0;
+  font-size: 0.85rem;
   color: #6b7280;
   font-weight: 600;
 }
 
 .event-desc {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: #4b5563;
   line-height: 1.5;
   display: -webkit-box;
@@ -128,10 +101,50 @@ h2 {
 
 .no-events {
   color: #6b7280;
-  font-size: 1.1rem;
+  font-size: 1rem;
   background: white;
-  padding: 30px;
+  padding: 24px;
   border-radius: 12px;
   text-align: center;
   border: 2px dashed #e5e7eb;
+}
+
+@media (min-width: 640px) {
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+  }
+  
+  .events-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .event-card {
+    padding: 20px;
+  }
+
+  .profile-pic {
+    width: 40px;
+    height: 40px;
+  }
+
+  .user-name { font-size: 0.95rem; }
+  .badge { font-size: 0.75rem; padding: 6px 14px; }
+  .event-title { font-size: 1.2rem; }
+  .event-date { font-size: 0.9rem; }
+  .event-desc { font-size: 0.95rem; }
+}
+
+@media (min-width: 1024px) {
+  .events-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1400px) {
+  .events-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
 }
