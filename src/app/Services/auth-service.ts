@@ -89,10 +89,7 @@ export class AuthService {
 
     if (token) {
       localStorage.setItem('token', token);
-      console.log(
-        'Token enregistré avec succès :',
-        token.substring(0, 10) + '...',
-      );
+
     } else {
       console.error(
         'ERREUR CRITIQUE : Aucun token trouvé dans la réponse !',

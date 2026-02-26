@@ -31,7 +31,6 @@ export class Home implements OnInit {
   loadUpcomingEvents() {
   this._calendarService.getUnifiedEvents().subscribe({
     next: (events: any[]) => {
-      console.log("📅 1. Événements bruts reçus :", events);
 
       const now = new Date(); 
       const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -81,8 +80,7 @@ export class Home implements OnInit {
         .sort((a, b) => a.parsedStart.getTime() - b.parsedStart.getTime())
         .slice(0, 12);
         this._cdr.detectChanges();
-        
-      console.log("✅ 2. Événements gardés pour l'affichage :", this.upcomingEvents);
+
     },
     error: err => console.error("Erreur chargement des événements:", err)
   });
